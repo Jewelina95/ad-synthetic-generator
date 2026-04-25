@@ -534,3 +534,104 @@ https://jewelina95.github.io/ad-synthetic-generator/                 网站
 **END OF LOG · 2026-04-25**
 
 下一会话起点建议: 设 ANTHROPIC_API_KEY → 跑 `cd AD MIND/demo && python3 07_run_all.py P02` → 看完整端到端 pipeline 跑出 markdown 报告。
+
+---
+
+# 19. 后续小迭代 (15:02 之后, 同一 session)
+
+## 19.1 进度汇报稿 (后被删)
+用户要求按李医生 `量表数据初步分析_讲话稿.md` 的口语风格写一份 5-7 分钟进度汇报, Claude 写了 162 行的 `进度汇报_口语版.md`. 用户嫌太长, 让删, 已删并 push.
+
+## 19.2 100 字内总结
+用户要 100 字内中文总结. Claude 给:
+> "整理了 10 个公开 AD 数据库（n=672+ 真实患者），覆盖 EEG/IMU/MOCA/MMSE。同时搭出两个不同架构的框架：MIND 是系统推理架构（Analyzer→3 Agent→Narrator pipeline），WIKI 是知识管理架构（raw/wiki/code 三层 Karpathy 风格）。基于这些做了合成数据生成器，10 患者×30 天×4 任务=1140 CSV。"
+
+## 19.3 项目三件套介绍 (多轮迭代)
+用户要"三件套介绍, generator 多讲点, 附网页链接". 经过 4-5 轮迭代:
+- 初版: 太详细, 列了 5 设计 + 4 任务 + 模态等
+- 二版: 数据集分类太学术 (一类二类三类四类)
+- 三版: 数据集码 ds004504/ds006095 太"AI 味"
+- 四版: 用 markdown 加粗 + 分组依然"AI 味"
+- 终版: 纯对话流, 无 bullet, 无 bold, 无数据集编号, 像真人汇报
+
+最终输出三个段落:
+1. AD Synthetic Generator (3 类数据来源融合)
+2. MIND Framework (系统推理架构)
+3. WIKI Framework (知识管理架构)
+
+每个附网站 + 仓库链接.
+
+## 19.4 用户的核心反馈学到的
+- "你能不能说人话" — 不要 markdown 结构, 不要分类, 不要数据集编号, 像真人讲话
+- "数据集这里太不清晰了" — 要按对比组类型分 (AD vs FTD / 家族性 / PD vs AD / 老年 baseline)
+- "李医生的数据集偏用户历史记录" — 这是关键定位, 要说出来
+- "100 字内" / "稍微多讲一点" — 长度控制非常严格
+- "你汇报能这么汇报?" — markdown 不是汇报形式
+
+## 19.5 数据集真实分类 (终版口径)
+用户认可的分类方法:
+
+```
+公开数据集 (8 个 OpenNeuro, n=672+):
+- AD vs FTD 对比 (希腊医院)
+- 家族性 AD (哥伦比亚 Lopera 队列)
+- PD vs AD 鉴别诊断
+- 老年 IMU baseline (跟硬件最对口)
+- 中年风险队列 (早期阶段参考)
+
+李医生量表数据库 (137 例):
+- 偏用户临床历史记录
+- 含眼底 OCT、海马 MRI、量表、纵向干预、性别差异、家族史、用药史
+
+中文对话语料 + 4 名健康志愿者 baseline
+```
+
+---
+
+# 20. 当前最终状态 (2026-04-25 EOD)
+
+## 20.1 GitHub 仓库 4 个核心文档
+```
+ad-synthetic-generator/
+├── README.md             完整设计报告 (~22 KB)
+├── PRESENTATION.md       3-5 分钟英文/混合演讲稿 (~13 KB)
+└── CONVERSATION_LOG.md   ★ 本日志 (本次 session 完整记录)
+```
+
+(进度汇报_口语版.md 已删)
+
+## 20.2 网站 6 个页面已上线自动部署
+1. index.html - Overview
+2. data-sources.html - 数据集介绍 + Plotly 分布图
+3. method.html - 4 大设计 + 5 progression 模式 + 认知储备
+4. tasks.html - 4 任务 + 下载样本
+5. patients.html - 10 患者卡片 + sensor 波形对比
+6. downloads.html - 集中下载入口
+
+## 20.3 数据规模
+- 8 OpenNeuro datasets calibration (n=672+)
+- 1140 sensor CSV (981 MB, 本地)
+- 9 sample CSV (~3 MB, 网站可下)
+
+## 20.4 用户最满意的汇报风格 (供未来参考)
+```
+"我们手套项目卡在数据这块——只有 4 个健康志愿者的真实数据,
+没有真实 AD 患者数据, 所以做了一个合成数据生成器解决这事.
+
+数据来源大概三块. 一块是 OpenNeuro 上找的 8 个公开数据集,
+覆盖 600 多个真实患者, 里头有希腊医院的 AD 和 FTD 对比数据、
+哥伦比亚 Lopera 团队的家族性 AD 队列、还有几个 PD 和 AD 鉴别诊断
+的数据. 最关键的是有一个 71 个老年人戴 IMU 走路的数据集, 跟我们
+手套硬件完全对口. ..."
+```
+
+风格特点:
+- 无 markdown 加粗、bullet、分组标题
+- 短句子, 口语化连接词 ("一块是" "里头有" "最关键的是" "再加上")
+- 不用数据集编号 (ds00xxxx 太"AI 味")
+- 数字直接说不写"n=88" 这种
+- 像真人对老师汇报的语气
+
+---
+
+**END · Session ended 2026-04-25**
