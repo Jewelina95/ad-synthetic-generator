@@ -44,33 +44,71 @@ async function renderMethod() {
   });
 
   // 2. Reserve effect plot
-  // raw progression: linear 0 -> 1
-  const days = Array.from({length: 30}, (_, i) => i);
-  const raw = days.map(d => d / 29);
-  const reserveCurves = [
-    { factor: 0.65, label: 'Reserve 0.65 (高 edu, 掩盖)',  color: ACCENT },
-    { factor: 1.00, label: 'Reserve 1.00 (基线)',          color: ACCENT_2 },
-    { factor: 1.15, label: 'Reserve 1.15 (低 edu, 显症)',  color: ACCENT_ROSE },
+  // x-axis: raw_progression (0 → 1, 同一疾病严重程度)
+  // y-axis: effective_progression (临床表现) = min(1, raw × factor)
+  // 5 条线对应 5 档教育/储备因子, 颜色冷→暖映射储备强→弱
+  const rawP = Array.from({length: 30}, (_, i) => i / 29);
+  const reserves = [
+    { name: '教育 ≥16年 (强储备, 掩盖)', factor: 0.65, color: '#3B82F6' },
+    { name: '教育 12年',                 factor: 0.85, color: '#10B981' },
+    { name: '教育 9年 (中性)',           factor: 1.00, color: '#A1A1AA' },
+    { name: '教育 6年',                   factor: 1.15, color: '#F59E0B' },
+    { name: '文盲 (弱储备, 显症)',       factor: 1.25, color: '#EF4444' },
   ];
-  const rTraces = [
+
+  const rTraces = reserves.map(r => ({
+    x: rawP,
+    y: rawP.map(p => Math.min(1, p * r.factor)),
+    type: 'scatter',
+    mode: 'lines',
+    name: r.name,
+    line: { color: r.color, width: 2.5, shape: 'spline' },
+    hovertemplate: `raw=%{x:.2f}<br>effective=%{y:.2f}<extra>${r.name}</extra>`,
+  }));
+
+  // y = x 中性参考虚线 (reserve=1 时的轨迹)
+  rTraces.push({
+    x: [0, 1],
+    y: [0, 1],
+    type: 'scatter',
+    mode: 'lines',
+    name: 'y = x (无储备效应)',
+    line: { color: '#5C6B7C', width: 1, dash: 'dot' },
+    hoverinfo: 'skip',
+  });
+
+  // 关键 annotation: 在 raw=0.6 处展示高/低教育的 effective 差异
+  const annotations = [
     {
-      x: days, y: raw,
-      type: 'scatter', mode: 'lines',
-      name: 'raw progression',
-      line: { color: '#4D5C70', width: 1.5, dash: 'dash' },
+      x: 0.6, y: 0.6 * 0.65,
+      text: '同 raw=0.6,<br>edu≥16 → eff≈0.39<br>(临床表现轻)',
+      showarrow: true, arrowhead: 2, arrowcolor: '#3B82F6',
+      ax: -70, ay: -40,
+      font: { size: 11, color: '#3B82F6' },
+      bgcolor: 'rgba(17,22,29,0.7)', bordercolor: '#3B82F6', borderwidth: 1,
     },
-    ...reserveCurves.map(rc => ({
-      x: days,
-      y: raw.map(v => Math.min(1, v * rc.factor)),
-      type: 'scatter', mode: 'lines',
-      name: rc.label,
-      line: { color: rc.color, width: 2.5 },
-    })),
+    {
+      x: 0.6, y: 0.6 * 1.25,
+      text: '文盲 → eff≈0.75<br>(临床表现重)',
+      showarrow: true, arrowhead: 2, arrowcolor: '#EF4444',
+      ax: 70, ay: 30,
+      font: { size: 11, color: '#EF4444' },
+      bgcolor: 'rgba(17,22,29,0.7)', bordercolor: '#EF4444', borderwidth: 1,
+    },
   ];
+
   plot('reservePlot', rTraces, {
-    xaxis: { title: 'Day' },
-    yaxis: { title: 'effective progression' },
+    xaxis: { title: 'raw_progression (实际疾病进展)', range: [0, 1], dtick: 0.2 },
+    yaxis: { title: 'effective_progression (临床表现)', range: [0, 1], dtick: 0.2 },
     legend: { orientation: 'h', y: -0.22, x: 0 },
-    margin: { l: 50, r: 18, t: 10, b: 60 },
+    margin: { l: 55, r: 18, t: 10, b: 70 },
+    annotations,
+    shapes: [
+      // raw=0.6 的垂直参考线, 突出 annotation 位置
+      {
+        type: 'line', x0: 0.6, x1: 0.6, y0: 0, y1: 1,
+        line: { color: '#5C6B7C', width: 1, dash: 'dash' },
+      },
+    ],
   });
 }

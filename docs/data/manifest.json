@@ -1,14 +1,118 @@
 {
-  "version": "v2.1",
+  "version": "v2.2",
   "n_days": 30,
-  "n_patients": 5,
+  "n_patients": 10,
+  "n_tasks": 4,
+  "structure": {
+    "by_patient": "data/synthetic/by_patient/PXX/sensor/dayXX_TASK.csv (个体纵向视图)",
+    "by_task": "data/synthetic/by_task/TASK/PXX_dayXX.csv (任务为中心, VBVR-style)"
+  },
   "features": [
-    "longitudinal trajectory",
+    "10 patients × 30-day longitudinal trajectory",
+    "task-centric output (VBVR-aligned: each task has its own folder)",
     "real distribution calibration (n=112 MMSE, n=71 MOCA)",
     "cross-modal coherence (sensor/EMA/survey/note from same progression)",
-    "BPSD episode injection",
+    "BPSD episode injection (Lit: 90% prevalence)",
     "missing data + motion artifacts",
     "cognitive reserve adjustment"
+  ],
+  "voice_modality": {
+    "status": "not_synthesized",
+    "reason": "我们只采集了健康人语音 baseline, 没有 AD 患者数据, 不能凭空合成",
+    "roles_in_system": [
+      {
+        "role": "input_analysis",
+        "desc": "ASR + 声学/语言特征 → Audio Agent 推断认知"
+      },
+      {
+        "role": "output_therapy",
+        "desc": "AI 语音互动 → 音乐疗法/呼吸引导/认知训练"
+      }
+    ],
+    "future_data_sources": [
+      "ADReSS Challenge (英文 AD 对话, 通过 DementiaBank)",
+      "MultiConAD 中文部分 (TAUKADIAL / iFlytek / NCMMSC2021)"
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "balance_standing",
+      "name_zh": "站立平衡",
+      "n_patients": 10,
+      "n_files": 300,
+      "n_days_per_patient": 30,
+      "patients": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10"
+      ],
+      "total_size_mb": 284.4
+    },
+    {
+      "task_id": "hand_fine_motor",
+      "name_zh": "手部精细运动",
+      "n_patients": 8,
+      "n_files": 240,
+      "n_days_per_patient": 30,
+      "patients": [
+        "P01",
+        "P02",
+        "P04",
+        "P05",
+        "P07",
+        "P08",
+        "P09",
+        "P10"
+      ],
+      "total_size_mb": 135.65
+    },
+    {
+      "task_id": "walking_dual_task",
+      "name_zh": "双任务行走",
+      "n_patients": 10,
+      "n_files": 300,
+      "n_days_per_patient": 30,
+      "patients": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10"
+      ],
+      "total_size_mb": 124.9
+    },
+    {
+      "task_id": "walking_normal",
+      "name_zh": "正常行走",
+      "n_patients": 10,
+      "n_files": 300,
+      "n_days_per_patient": 30,
+      "patients": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10"
+      ],
+      "total_size_mb": 436.44
+    }
   ],
   "personas": [
     {
@@ -18,7 +122,7 @@
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 2,
+      "n_bpsd_events": 0,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -33,7 +137,7 @@
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 1,
+      "n_bpsd_events": 2,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -62,7 +166,7 @@
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 1,
+      "n_bpsd_events": 0,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -72,6 +176,80 @@
     },
     {
       "persona": "P05",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P06",
+      "n_days": 30,
+      "n_sensor_files": 90,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 1,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing"
+      ]
+    },
+    {
+      "persona": "P07",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 1,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P08",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P09",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 1,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P10",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,

@@ -121,7 +121,45 @@ PERSONAS = [
     {"id": "P03", "base": "S02_junkai", "age": 70, "gender": "M", "education": 16, "pattern": "plateau",     "bpsd_prone": False},
     {"id": "P04", "base": "S03_jialu",  "age": 75, "gender": "F", "education": 9,  "pattern": "fluctuation", "bpsd_prone": True},
     {"id": "P05", "base": "S04_zhe",    "age": 72, "gender": "M", "education": 12, "pattern": "acute_event", "bpsd_prone": False},
+    {"id": "P06", "base": "S02_junkai", "age": 65, "gender": "M", "education": 9,  "pattern": "linear",      "bpsd_prone": False},
+    {"id": "P07", "base": "S03_jialu",  "age": 78, "gender": "F", "education": 6,  "pattern": "stepwise",    "bpsd_prone": True},
+    {"id": "P08", "base": "S04_zhe",    "age": 71, "gender": "M", "education": 16, "pattern": "fluctuation", "bpsd_prone": False},
+    {"id": "P09", "base": "S01_zewei",  "age": 76, "gender": "M", "education": 4,  "pattern": "acute_event", "bpsd_prone": True},
+    {"id": "P10", "base": "S03_jialu",  "age": 69, "gender": "F", "education": 12, "pattern": "plateau",     "bpsd_prone": False},
 ]
+
+# ── ⭐ 任务清单 (与 baseline 对齐) ──
+# 每个任务 = 一个独立的"数据 pipeline" (类比 VBVR M-XXX 任务)
+# 10 个 patient 在同一 task 下生成 10 个不同 CSV
+TASKS = [
+    {"id": "walking_normal",     "name_zh": "正常行走",       "n_subjects_baseline": 4},
+    {"id": "walking_dual_task",  "name_zh": "双任务行走",     "n_subjects_baseline": 4},
+    {"id": "balance_standing",   "name_zh": "站立平衡",       "n_subjects_baseline": 4},
+    {"id": "hand_fine_motor",    "name_zh": "手部精细运动",   "n_subjects_baseline": 3},
+    {"id": "sit_to_stand",       "name_zh": "坐立转换",       "n_subjects_baseline": 4},
+    {"id": "turning",            "name_zh": "转身",           "n_subjects_baseline": 4},
+    {"id": "wandering_simulate", "name_zh": "游荡模拟 (BPSD)", "n_subjects_baseline": 4},
+]
+
+# ── ⭐ 语音模态说明 (不合成) ──
+# 我们目前**只采集了健康人的语音 baseline**, 没有 AD 患者真实语音数据.
+# 因此生成器**不合成**语音特征 — 避免脱离真实分布造假.
+# 语音在系统里有两个用途:
+#   1. INPUT 分析: 患者实时对话 → ASR + 声学特征 → Audio Agent 推断认知状态
+#   2. OUTPUT 治疗: AI 生成语音回应 → 音乐疗法/呼吸引导/认知互动 (干预闭环)
+# 未来如有 AD 患者语音数据 (ADReSS / MultiConAD 中文部分), 再加入合成.
+VOICE_MODALITY_NOTE = {
+    "status": "not_synthesized",
+    "reason": "我们只采集了健康人语音 baseline, 没有 AD 患者数据, 不能凭空合成",
+    "roles_in_system": [
+        {"role": "input_analysis", "desc": "ASR + 声学/语言特征 → Audio Agent 推断认知"},
+        {"role": "output_therapy", "desc": "AI 语音互动 → 音乐疗法/呼吸引导/认知训练"},
+    ],
+    "future_data_sources": [
+        "ADReSS Challenge (英文 AD 对话, 通过 DementiaBank)",
+        "MultiConAD 中文部分 (TAUKADIAL / iFlytek / NCMMSC2021)",
+    ],
+}
 
 
 def load_baselines():
@@ -155,14 +193,14 @@ def decide_bpsd_episodes(persona, n_days, progression_fn, rng):
             if persona.get("bpsd_prone"):
                 base_prob *= 2.5
             if rng.random() < base_prob:
-                # 选时段
+                # 选时段 (强制转 python int, 避免 numpy int64 不能 json)
                 if "time_window" in spec:
-                    hour = rng.integers(spec["time_window"][0], spec["time_window"][1])
+                    hour = int(rng.integers(spec["time_window"][0], spec["time_window"][1]))
                 else:
                     hour = int(rng.integers(8, 22))
                 episodes.append({
-                    "day": day, "hour": hour, "type": bpsd_type,
-                    "duration_min": spec["duration_minutes"],
+                    "day": int(day), "hour": hour, "type": str(bpsd_type),
+                    "duration_min": int(spec["duration_minutes"]),
                     "progression_at_event": float(p),
                 })
     return episodes
@@ -339,9 +377,12 @@ def generate_one_persona(persona, baselines, n_days):
 
     rng_master = np.random.default_rng(hash(persona["id"]) % 2**32)
 
-    pdir = OUT_DIR / persona["id"]
+    # ★ 双视图: by_patient (患者视角) + by_task (任务视角, VBVR-style)
+    pdir = OUT_DIR / "by_patient" / persona["id"]
     sensor_dir = pdir / "sensor"
     sensor_dir.mkdir(parents=True, exist_ok=True)
+    by_task_root = OUT_DIR / "by_task"
+    by_task_root.mkdir(parents=True, exist_ok=True)
 
     # ⭐ BPSD 事件预先决策
     bpsd_episodes = decide_bpsd_episodes(persona, n_days, progression_fn, rng_master)
@@ -393,7 +434,7 @@ def generate_one_persona(persona, baselines, n_days):
         # 当日 BPSD?
         bpsd_today = next((e for e in bpsd_episodes if e["day"] == day), None)
 
-        # Sensor (每任务一段)
+        # Sensor (每任务一段) — 同时写两份: 患者视角 + 任务视角
         for task in available_tasks:
             seed = hash((persona["id"], day, task)) % 2**32
             degraded = degrade_sensor(base[task], eff_p, daily_seed=seed, bpsd_today=bpsd_today)
@@ -401,7 +442,16 @@ def generate_one_persona(persona, baselines, n_days):
                          "imu_ax_mps2", "imu_ay_mps2", "imu_az_mps2", "svm", "jerk",
                          "hr_valid_flag", "label"]
             keep_cols = [c for c in keep_cols if c in degraded.columns]
-            degraded[keep_cols].to_csv(sensor_dir / f"day{day:02d}_{task}.csv", index=False)
+            sub = degraded[keep_cols].copy()
+            sub["patient_id"] = persona["id"]
+            sub["day"] = day
+            sub["progression"] = round(eff_p, 3)
+            # 视图 1: by_patient (个体纵向)
+            sub.to_csv(sensor_dir / f"day{day:02d}_{task}.csv", index=False)
+            # 视图 2: by_task (VBVR-style task-centric, 每任务一个文件夹)
+            task_dir = by_task_root / task
+            task_dir.mkdir(parents=True, exist_ok=True)
+            sub.to_csv(task_dir / f"{persona['id']}_day{day:02d}.csv", index=False)
 
         # EMA
         for h in [9, 14, 20]:
@@ -444,11 +494,17 @@ def generate_one_persona(persona, baselines, n_days):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--days", type=int, default=30, help="生成多少天的轨迹")
-    parser.add_argument("--patients", type=int, default=5, help="生成多少个虚拟患者")
+    parser.add_argument("--patients", type=int, default=10, help="生成多少个虚拟患者 (默认 10)")
     args = parser.parse_args()
 
     n_days = args.days
     selected_personas = PERSONAS[:args.patients]
+
+    # ★ 清空旧输出, 重生成 (旧结构 P01/sensor/... 已废弃, 改成 by_patient + by_task)
+    import shutil
+    if OUT_DIR.exists():
+        shutil.rmtree(OUT_DIR)
+    OUT_DIR.mkdir(parents=True)
 
     print("=" * 60)
     print(f"生成器 v2.1 — {n_days} 天 × {len(selected_personas)} 患者")
@@ -476,27 +532,66 @@ def main():
                   f"{result['n_bpsd_events']} BPSD 事件")
         print()
 
+    # ★ 任务级 manifest: by_task 视图下每个 task 的统计
+    by_task_root = OUT_DIR / "by_task"
+    task_manifest = []
+    for task_dir in sorted(by_task_root.glob("*")):
+        if not task_dir.is_dir():
+            continue
+        task_id = task_dir.name
+        files = list(task_dir.glob("*.csv"))
+        # 统计该任务下患者数 + 总文件数
+        patient_ids = sorted(set(f.stem.split("_day")[0] for f in files))
+        task_meta = next((t for t in TASKS if t["id"] == task_id), {"name_zh": task_id})
+        task_manifest.append({
+            "task_id": task_id,
+            "name_zh": task_meta.get("name_zh", task_id),
+            "n_patients": len(patient_ids),
+            "n_files": len(files),
+            "n_days_per_patient": n_days,
+            "patients": patient_ids,
+            "total_size_mb": round(sum(f.stat().st_size for f in files) / 1024 / 1024, 2),
+        })
+
     with open(OUT_DIR / "manifest.json", "w") as f:
         json.dump({
-            "version": "v2.1",
+            "version": "v2.2",
             "n_days": n_days,
             "n_patients": len(summary),
+            "n_tasks": len(task_manifest),
+            "structure": {
+                "by_patient": "data/synthetic/by_patient/PXX/sensor/dayXX_TASK.csv (个体纵向视图)",
+                "by_task":    "data/synthetic/by_task/TASK/PXX_dayXX.csv (任务为中心, VBVR-style)",
+            },
             "features": [
-                "longitudinal trajectory",
+                "10 patients × 30-day longitudinal trajectory",
+                "task-centric output (VBVR-aligned: each task has its own folder)",
                 "real distribution calibration (n=112 MMSE, n=71 MOCA)",
                 "cross-modal coherence (sensor/EMA/survey/note from same progression)",
-                "BPSD episode injection",
+                "BPSD episode injection (Lit: 90% prevalence)",
                 "missing data + motion artifacts",
                 "cognitive reserve adjustment",
             ],
+            "voice_modality": VOICE_MODALITY_NOTE,  # ★ 语音不合成, 只标记两种用途
+            "tasks": task_manifest,
             "personas": summary,
         }, f, ensure_ascii=False, indent=2)
 
     print("=" * 60)
     print(f"✓ 完成. 输出: {OUT_DIR}")
-    print(f"  共 {len(summary)} 个患者, {n_days} 天")
+    print(f"  患者: {len(summary)}, 天数: {n_days}, 任务: {len(task_manifest)}")
+    print()
+    print("📁 by_task 视图 (VBVR-style 任务为中心):")
+    for tm in task_manifest:
+        print(f"  {tm['task_id']:25s} {tm['n_patients']:3d} patients, {tm['n_files']:4d} files, {tm['total_size_mb']:.1f} MB")
     total_bpsd = sum(s['n_bpsd_events'] for s in summary)
-    print(f"  BPSD 事件总数: {total_bpsd}")
+    print(f"\n  BPSD 事件总数: {total_bpsd}")
+    print()
+    print("🎤 语音模态:", VOICE_MODALITY_NOTE["status"])
+    print(f"   原因: {VOICE_MODALITY_NOTE['reason']}")
+    print("   系统中两种用途:")
+    for r in VOICE_MODALITY_NOTE["roles_in_system"]:
+        print(f"     • {r['role']}: {r['desc']}")
 
 
 if __name__ == "__main__":

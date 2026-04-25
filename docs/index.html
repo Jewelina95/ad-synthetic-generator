@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AD 多模态合成数据生成器 &middot; Overview</title>
-  <meta name="description" content="基于真实可穿戴 baseline 与 5 个 OpenNeuro 数据集 (n=112) 校准的 AD 合成患者数据生成器." />
+  <meta name="description" content="基于真实可穿戴 baseline 与 5 个 OpenNeuro 数据集 (n=112) 校准的 AD 合成患者数据生成器, 任务为中心 (VBVR-style) 输出." />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
@@ -13,18 +13,23 @@
 <!-- HERO -->
 <section class="hero">
   <div class="container">
-    <span class="hero-tag">v2.1 &middot; calibrated by real distributions</span>
+    <span class="hero-tag">v2.2 &middot; task-centric (VBVR-aligned) &middot; calibrated by real distributions</span>
     <h1>AD 多模态合成<br />患者数据生成器</h1>
     <p class="hero-sub">
       Calibrated by real distributions from 5 OpenNeuro datasets (n=112).
       生成 30 天纵向 sensor / EMA / 量表 / 临床 note / BPSD 事件 — 跨模态一致, 分布对齐真实老年与 AD 队列.
+      v2.2 引入 <b>任务为中心</b> 输出结构 (10 patients × 4 tasks × 30 days).
     </p>
 
     <!-- KEY STATS -->
     <div class="stat-row">
       <div class="stat">
-        <div class="stat-num">5<small> patients</small></div>
+        <div class="stat-num">10<small> patients</small></div>
         <div class="stat-label">虚拟 AD 患者</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statTasks">4<small> tasks</small></div>
+        <div class="stat-label">VBVR-style 任务数</div>
       </div>
       <div class="stat">
         <div class="stat-num">30<small> days</small></div>
@@ -34,10 +39,6 @@
         <div class="stat-num">112<small> real</small></div>
         <div class="stat-label">分布校准样本</div>
       </div>
-      <div class="stat">
-        <div class="stat-num">4<small> modalities</small></div>
-        <div class="stat-label">Sensor + EMA + 量表 + Note</div>
-      </div>
     </div>
   </div>
 </section>
@@ -46,9 +47,10 @@
 <section class="section">
   <div class="container">
     <div class="eyebrow">System Architecture</div>
-    <h2 class="section-title">三源校准, 一体生成</h2>
+    <h2 class="section-title">三源校准, 一体生成, 任务为中心</h2>
     <p class="section-sub">
-      生成器 v2.1 把三类信号融合: 真实健康可穿戴 baseline + 公开 AD/老年队列分布 + 临床专家知识. 所有合成轨迹共享同一进展度变量, 保证跨模态自洽.
+      生成器 v2.2 把三类信号融合: 真实健康可穿戴 baseline + 公开 AD/老年队列分布 + 临床专家知识.
+      所有合成轨迹共享同一进展度变量, 保证跨模态自洽; 输出同时按 patient 与按 task 双重组织, 方便下游 Analyzer/Agent 训练.
     </p>
 
     <div class="arch">
@@ -74,8 +76,8 @@
       <!-- CORE -->
       <div>
         <div class="arch-core">
-          <div class="arch-core-title">生成器 v2.1</div>
-          <div class="arch-core-sub">progression × persona × cross-modal coupling</div>
+          <div class="arch-core-title">生成器 v2.2</div>
+          <div class="arch-core-sub">progression × persona × cross-modal coupling × per-task</div>
         </div>
       </div>
 
@@ -85,16 +87,16 @@
       <!-- OUTPUTS -->
       <div class="arch-col">
         <div class="arch-out">
-          <strong>5 patients × 30 days</strong>
-          <small>540 sensor files</small>
+          <strong>by_patient (个体纵向)</strong>
+          <small>data/synthetic/by_patient/PXX/sensor/dayXX_TASK.csv</small>
         </div>
         <div class="arch-out">
-          <strong>EMA + 量表 + Notes</strong>
-          <small>450 EMA &middot; 25 surveys &middot; 5 clinical notes</small>
+          <strong>by_task (VBVR-style 任务为中心)</strong>
+          <small>data/synthetic/by_task/TASK/PXX_dayXX.csv</small>
         </div>
         <div class="arch-out">
-          <strong>BPSD 事件</strong>
-          <small>4 episodes, 90% prevalence</small>
+          <strong>EMA + 量表 + Notes + BPSD</strong>
+          <small>900 EMA &middot; 50 surveys &middot; 10 notes &middot; 4 episodes</small>
         </div>
       </div>
     </div>
@@ -106,9 +108,9 @@
   <div class="container">
     <div class="eyebrow">Key Features</div>
     <h2 class="section-title">为什么不是又一个噪声生成器</h2>
-    <p class="section-sub">每个模态都被同一进展度变量驱动, 量表落点与真实分布在 KS 检验下不可区分, 行为事件按文献先验注入.</p>
+    <p class="section-sub">每个模态都被同一进展度变量驱动, 量表落点与真实分布在 KS 检验下不可区分, 行为事件按文献先验注入, 输出同时按 patient 与 task 双轴组织.</p>
 
-    <div class="grid-4">
+    <div class="grid-4" style="grid-template-columns: repeat(5, 1fr);">
       <div class="card">
         <div class="card-icon">&#9678;</div>
         <h3>真实分布对标</h3>
@@ -128,6 +130,11 @@
         <div class="card-icon">&#x1D4D5;</div>
         <h3>认知储备机制</h3>
         <p>edu 16y → reserve 0.65 (强, 掩盖症状); edu 6y → reserve 1.15 (弱, 显症提前) — Stern 2002.</p>
+      </div>
+      <div class="card" style="border-color: rgba(94,234,212,0.45);">
+        <div class="card-icon">&#9783;</div>
+        <h3>任务为中心 (Task-Centric)</h3>
+        <p>VBVR-aligned 输出: 4 个任务 × 10 患者 × 30 天独立 CSV. 每个任务可独立训练 Analyzer / Agent, 与 M-002 / M-003 pipeline 结构一致.</p>
       </div>
     </div>
   </div>
@@ -149,7 +156,7 @@
 <!-- CTA -->
 <section class="section-tight">
   <div class="container">
-    <div class="grid-3">
+    <div class="grid-4">
       <a href="data-sources.html" class="card">
         <div class="card-icon">&#x21A6;</div>
         <h3>Data Sources</h3>
@@ -158,12 +165,17 @@
       <a href="method.html" class="card">
         <div class="card-icon">&#x21A6;</div>
         <h3>Method</h3>
-        <p>4 层嵌套生成结构, 5 种 progression 模式, 退化系数表.</p>
+        <p>4 层嵌套生成结构, 5 种 progression 模式, 退化系数表, 第 5 模态语音说明.</p>
+      </a>
+      <a href="tasks.html" class="card">
+        <div class="card-icon">&#x21A6;</div>
+        <h3>Tasks (VBVR-style)</h3>
+        <p>4 个任务 × 10 患者 × 30 天的任务为中心数据网格.</p>
       </a>
       <a href="patients.html" class="card">
         <div class="card-icon">&#x21A6;</div>
         <h3>Patient Gallery</h3>
-        <p>5 名虚拟患者的纵向轨迹 — 量表 / EMA / BPSD / note.</p>
+        <p>10 名虚拟患者的纵向轨迹 — 量表 / EMA / BPSD / note.</p>
       </a>
     </div>
   </div>
@@ -176,6 +188,13 @@
     insertNav('index');
     insertFooter();
     renderHomeMmseTeaser();
+    // pull live n_tasks from manifest
+    fetchJSON('data/manifest.json').then(m => {
+      if (m && Array.isArray(m.tasks)) {
+        const el = document.getElementById('statTasks');
+        if (el) el.innerHTML = `${m.tasks.length}<small> tasks</small>`;
+      }
+    }).catch(() => {});
   });
 </script>
 

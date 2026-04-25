@@ -14,6 +14,7 @@ function insertNav(activePage) {
     { id: 'index',        label: 'Overview',     href: 'index.html' },
     { id: 'data-sources', label: 'Data Sources', href: 'data-sources.html' },
     { id: 'method',       label: 'Method',       href: 'method.html' },
+    { id: 'tasks',        label: 'Tasks',        href: 'tasks.html' },
     { id: 'patients',     label: 'Patients',     href: 'patients.html' },
   ];
   const html = `
@@ -44,7 +45,7 @@ function insertFooter() {
   const html = `
     <footer class="footer">
       <div class="container">
-        <div>AD Multimodal Synthetic Data Generator &middot; v2.1 &middot; Calibrated by 5 OpenNeuro datasets (n=112)</div>
+        <div>AD Multimodal Synthetic Data Generator &middot; v2.2 &middot; Task-centric (VBVR-aligned) &middot; Calibrated by 5 OpenNeuro datasets (n=112)</div>
         <div class="faint mono">Generated 2026-04-25</div>
       </div>
     </footer>

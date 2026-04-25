@@ -30,11 +30,15 @@
       </thead>
       <tbody>
         <tr><td>S01</td><td class="mono">zewei</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P01, P02 base</td></tr>
-        <tr><td>S02</td><td class="mono">junkai</td> <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P03 base</td></tr>
-        <tr><td>S03</td><td class="mono">jialu</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P04 base</td></tr>
-        <tr><td>S04</td><td class="mono">zhe</td>    <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P05 base</td></tr>
+        <tr><td>S02</td><td class="mono">junkai</td> <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P03, P06 base</td></tr>
+        <tr><td>S03</td><td class="mono">jialu</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P04, P09, P10 base</td></tr>
+        <tr><td>S04</td><td class="mono">zhe</td>    <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P05, P07, P08 base</td></tr>
       </tbody>
     </table>
+    <p class="muted" style="margin-top: 14px; font-size: 0.9rem;">
+      注: 我们同时采集了这 4 名健康受试者的<b>中文语音 baseline</b>, 但<b>未在 v2.2 中合成 AD 患者语音</b> —
+      因为没有真实 AD 患者语音分布作为锚点, 凭空合成会脱离真实人群. 详见 <a href="method.html">Method §5</a>.
+    </p>
   </div>
 </section>
 
@@ -42,10 +46,27 @@
 <section class="section">
   <div class="container">
     <h2 class="section-title">2. OpenNeuro 公开数据集</h2>
-    <p class="section-sub">用于校准合成患者分布的 5 个开源队列. 涵盖 AD / FTD / MCI / 老年 / PD 共 n=560+ 受试者.</p>
+    <p class="section-sub">用于校准合成患者分布的 5 个开源队列. 涵盖 AD / FTD / MCI / 老年 / PD 共 n=560+ 受试者. <span class="faint">点击任一卡片查看完整介绍 / 真实样本 / 我们怎么用它 / 代码片段.</span></p>
     <div class="grid-2" id="dsCards"><!-- filled by JS --></div>
   </div>
 </section>
+
+<!-- DATASET MODAL -->
+<div id="dsModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal" id="dsModal">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow" id="dsModalEyebrow">Dataset</div>
+        <h2 id="dsModalTitle" style="margin: 0; font-size: 1.4rem;">Dataset</h2>
+        <div id="dsModalSub" class="faint mono" style="font-size: 0.85rem; margin-top: 4px;"></div>
+      </div>
+      <button class="modal-close" id="dsModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="dsModalBody">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
 
 <!-- DISTRIBUTIONS -->
 <section class="section">

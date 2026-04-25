@@ -117,11 +117,85 @@
   </div>
 </section>
 
+<!-- VOICE MODALITY (5th, not synthesized) -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">5. <span style="color: var(--accent);">🎤</span> 第 5 模态: 语音 — 不合成, 但有两种用途</h2>
+    <p class="section-sub">
+      生成器目前合成 4 个模态 (Sensor / EMA / Survey / Note). 语音是<b>第 5 个模态</b>, 但<b>不在 v2.2 中合成</b> —
+      原因是我们只采集了健康人语音 baseline (中文/方言), 没有真实 AD 患者中文对话数据, 凭空合成会脱离真实分布, 误导系统训练.
+      等拿到 ADReSS / MultiConAD 中文部分后再加入.
+    </p>
+
+    <!-- Why not synthesized -->
+    <div class="ds-howuse" style="margin-bottom: 20px; border-left-color: var(--accent-warm);">
+      <strong style="color: var(--accent-warm);">为什么不合成?</strong>
+      <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-dim);">
+        <li>只采集了健康人语音 baseline (中文 / 方言)</li>
+        <li>没有真实 AD 患者中文对话数据</li>
+        <li>凭空合成会脱离真实分布, 误导系统训练</li>
+        <li>等拿到 ADReSS / MultiConAD 中文部分后再加入真实人群</li>
+      </ul>
+    </div>
+
+    <!-- INPUT vs OUTPUT two columns -->
+    <div class="grid-2">
+      <div class="card" style="border-left: 3px solid var(--accent-2);">
+        <div class="card-icon" style="background: rgba(56,189,248,0.10); border-color: rgba(56,189,248,0.30); color: var(--accent-2);">⬇</div>
+        <h3>1️⃣ INPUT — 实时认知推断</h3>
+        <p style="color: var(--text);">
+          患者日常对话 → ASR (Whisper large-v3) + 声学特征 (F0, jitter, shimmer)
+          + 语言学特征 (TTR, 停顿率, 语义连贯性) → <b>Audio Agent</b> → 认知状态.
+        </p>
+        <div class="ds-tag-row" style="margin-top: 10px;">
+          <span class="ds-badge">Whisper large-v3</span>
+          <span class="ds-badge">F0 / jitter / shimmer</span>
+          <span class="ds-badge">TTR</span>
+          <span class="ds-badge">pause rate</span>
+          <span class="ds-badge">semantic coherence</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-left: 3px solid var(--accent-rose);">
+        <div class="card-icon" style="background: rgba(244,114,182,0.10); border-color: rgba(244,114,182,0.30); color: var(--accent-rose);">⬆</div>
+        <h3>2️⃣ OUTPUT — 实时治疗互动</h3>
+        <p style="color: var(--text);">
+          AI 生成语音回应 → 通过手套扬声器播放, 覆盖 4 类干预:
+        </p>
+        <ul style="margin: 4px 0 0 18px; padding: 0; color: var(--text-dim); font-size: 0.92rem; line-height: 1.7;">
+          <li><b style="color: var(--text);">音乐疗法</b> — 个性化选曲 (A 级证据)</li>
+          <li><b style="color: var(--text);">呼吸引导</b> — BPSD 激越前 1–2 小时预警时启动</li>
+          <li><b style="color: var(--text);">认知训练</b> — 命名 / 流利性 / 记忆任务</li>
+          <li><b style="color: var(--text);">怀旧疗法</b> — 语音引导回忆</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Future data sources -->
+    <div class="plot-frame mt-3" style="padding: 18px 22px;">
+      <div class="plot-title" style="margin-bottom: 8px;">
+        <b>未来数据源 (语音模态接入计划)</b>
+        <span class="faint mono">待数据落地后补 v2.3</span>
+      </div>
+      <table class="tbl" style="margin-top: 8px;">
+        <thead><tr><th>来源</th><th>语种</th><th>类型</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td>ADReSS Challenge (DementiaBank)</td><td>英文</td><td>AD 对话 + 量表</td><td>已有访问申请模板</td></tr>
+          <tr><td>MultiConAD — TAUKADIAL</td><td>中文 + 多语</td><td>AD 多模态会话</td><td>待联系</td></tr>
+          <tr><td>MultiConAD — iFlytek</td><td>中文</td><td>语音 + ASR</td><td>待联系</td></tr>
+          <tr><td>MultiConAD — NCMMSC2021</td><td>中文</td><td>AD 检测 challenge</td><td>已知</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <!-- COGNITIVE RESERVE -->
 <section class="section">
   <div class="container">
-    <h2 class="section-title">5. 认知储备机制</h2>
+    <h2 class="section-title">6. 认知储备机制</h2>
     <p class="section-sub">教育年限 (edu) 决定 cognitive_reserve_factor. 高储备掩盖症状 (effective_progression &lt; raw_progression), 低储备显症提前. 模型自 Stern 2002 储备假说.</p>
+    <p class="section-sub">高教育者凭借<b>认知储备</b> (cognitive reserve) 可在大脑实际损伤已发生时, 仍维持表面正常的认知表现. 同样的 raw_progression 在临床上表现得更轻 — 这正是 MMSE 量表对高教育者敏感度低的根本原因 (李医生采访 1.1 节).</p>
 
     <table class="tbl">
       <thead><tr><th>Education (yrs)</th><th>Reserve factor</th><th>临床效果</th><th>本项目示例</th></tr></thead>
@@ -134,7 +208,7 @@
     </table>
 
     <div class="plot-frame mt-3">
-      <div class="plot-title"><b>认知储备效应示意</b><span class="faint mono">同一 raw progression 在不同 reserve 下的实际表现</span></div>
+      <div class="plot-title"><b>认知储备效应: 高教育掩盖早期症状</b><span class="faint mono">同一 raw_progression, 5 档教育水平对应的 effective_progression</span></div>
       <div id="reservePlot" style="height: 320px;"></div>
     </div>
   </div>

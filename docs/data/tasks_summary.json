@@ -1,0 +1,80 @@
+[
+  {
+    "task_id": "balance_standing",
+    "name_zh": "站立平衡",
+    "n_patients": 10,
+    "n_files": 300,
+    "n_days_per_patient": 30,
+    "patients": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "P09",
+      "P10"
+    ],
+    "size_mb": 284.4
+  },
+  {
+    "task_id": "hand_fine_motor",
+    "name_zh": "手部精细运动",
+    "n_patients": 8,
+    "n_files": 240,
+    "n_days_per_patient": 30,
+    "patients": [
+      "P01",
+      "P02",
+      "P04",
+      "P05",
+      "P07",
+      "P08",
+      "P09",
+      "P10"
+    ],
+    "size_mb": 135.65
+  },
+  {
+    "task_id": "walking_dual_task",
+    "name_zh": "双任务行走",
+    "n_patients": 10,
+    "n_files": 300,
+    "n_days_per_patient": 30,
+    "patients": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "P09",
+      "P10"
+    ],
+    "size_mb": 124.9
+  },
+  {
+    "task_id": "walking_normal",
+    "name_zh": "正常行走",
+    "n_patients": 10,
+    "n_files": 300,
+    "n_days_per_patient": 30,
+    "patients": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "P09",
+      "P10"
+    ],
+    "size_mb": 436.44
+  }
+]

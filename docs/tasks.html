@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tasks &middot; AD Synthetic Data Generator</title>
+  <meta name="description" content="Task-centric VBVR-aligned data structure: 4 tasks × 10 patients × 30 days." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- HERO -->
+<section class="section" style="padding-top: 70px;">
+  <div class="container">
+    <div class="eyebrow">Tasks · VBVR-style</div>
+    <h1 style="font-size: 2.2rem;">Task-Centric Generation (VBVR-aligned)</h1>
+    <p class="section-sub">
+      v2.2 输出按 <b>任务为中心</b> 组织: 每个任务下 10 个 patient 各自生成不同的 CSV, 30 天独立轨迹, 退化幅度因人而异 (不同 progression pattern + cognitive reserve).
+      这与 Aaron 之前 VBVR 项目的 pipeline 结构一致 — M-002, M-003 各自独立训练.
+    </p>
+
+    <!-- Tasks summary stats -->
+    <div class="stat-row" style="grid-template-columns: repeat(4, 1fr); margin-top: 24px;">
+      <div class="stat">
+        <div class="stat-num" id="statTotalTasks">—</div>
+        <div class="stat-label">任务数</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statTotalFiles">—</div>
+        <div class="stat-label">CSV 文件总数</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statTotalSize">—<small> MB</small></div>
+        <div class="stat-label">数据总大小</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">10<small> patients</small></div>
+        <div class="stat-label">每任务最多覆盖</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TASK GRID -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <h2 class="section-title">4 个任务 · 点卡片查看患者列表与文件结构</h2>
+    <p class="section-sub">每个任务下生成 N 个 patient × 30 天 = N×30 个 CSV (50Hz × 60s sensor segment). 任务覆盖患者数可能不同 — 部分患者跳过 hand_fine_motor.</p>
+
+    <div class="grid-2" id="taskGrid">
+      <div class="muted">Loading tasks...</div>
+    </div>
+  </div>
+</section>
+
+<!-- VBVR ALIGNMENT -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">为什么任务为中心?</h2>
+    <div class="ds-howuse" style="font-size: 0.95rem; line-height: 1.75;">
+      最终系统会让用户做不同 task — 行走 / 双任务 / 平衡 / 手部精细 — 每个 task 训练独立的 Analyzer / Agent.
+      <br /><br />
+      这跟 Aaron 之前的 <b>VBVR (Video-Based Vision-Reasoning)</b> 项目结构一致:
+      <span class="mono">M-002</span> 和 <span class="mono">M-003</span> 是各自独立的 pipeline, 每个 pipeline 拿到与该 task 完全对齐的训练数据.
+      <br /><br />
+      因此 v2.2 的输出同时按两个轴组织:
+      <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-dim);">
+        <li><span class="mono">by_patient/PXX/sensor/dayXX_TASK.csv</span> — 个体纵向视图, 用于持续监护与 EMA / 量表对齐</li>
+        <li><span class="mono">by_task/TASK/PXX_dayXX.csv</span> — 任务为中心, 用于训练任务独立的 Analyzer / Agent</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TASK DETAIL MODAL -->
+<div id="taskModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal" id="taskModal">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow" id="taskModalEyebrow">Task</div>
+        <h2 id="taskModalTitle" style="margin: 0; font-size: 1.4rem;">Task</h2>
+        <div id="taskModalSub" class="faint mono" style="font-size: 0.85rem; margin-top: 4px;"></div>
+      </div>
+      <button class="modal-close" id="taskModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="taskModalBody">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/tasks.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    insertNav('tasks');
+    insertFooter();
+    renderTasksPage();
+  });
+</script>
+
+</body>
+</html>
