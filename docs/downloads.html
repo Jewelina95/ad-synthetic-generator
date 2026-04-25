@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Downloads — AD Synthetic Generator</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.dl-hero { text-align: center; padding: 40px 0 24px; }
+.dl-hero h1 { font-size: 36px; margin: 0 0 12px; }
+.dl-hero p { color: var(--text-muted); max-width: 720px; margin: 0 auto; }
+
+.dl-section { margin: 40px auto; max-width: 1100px; padding: 0 24px; }
+.dl-section h2 { font-size: 22px; margin-bottom: 8px; }
+.dl-section .desc { color: var(--text-muted); margin-bottom: 20px; }
+
+.dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 768px) { .dl-grid { grid-template-columns: 1fr; } }
+
+.dl-card { background: var(--bg-elev-1); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; transition: all 0.15s; }
+.dl-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.dl-card .dl-name { font-family: monospace; font-size: 13px; color: var(--text); display: block; margin-bottom: 6px; word-break: break-all; }
+.dl-card .dl-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.dl-card .dl-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--accent-soft); color: var(--accent); margin-right: 6px; }
+.dl-card a.dl-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--accent); color: var(--bg); border-radius: 6px; font-weight: 600; font-size: 13px; text-decoration: none; transition: filter 0.15s; }
+.dl-card a.dl-btn:hover { filter: brightness(1.1); }
+
+.dl-warning { background: #2D1F0E; border: 1px solid #6B4513; border-radius: 8px; padding: 16px 20px; margin: 24px 0; color: #F5DEB3; }
+.dl-warning b { color: #FFC880; }
+
+.dl-code-block { background: #06090D; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; font-family: monospace; font-size: 13px; color: #A7F3D0; overflow-x: auto; line-height: 1.7; }
+.dl-code-block .comment { color: #6B7280; }
+.dl-code-block .cmd { color: #F5F5F5; }
+</style>
+</head>
+<body>
+
+<div class="dl-hero">
+  <h1>📥 Downloads</h1>
+  <p>所有可下载的样本 CSV + 完整数据集生成方法. 网页直接下样本, 完整数据集需要 clone repo 后本地生成.</p>
+</div>
+
+<!-- ============================================== -->
+<!-- 1. 直接下载: 样本 CSV -->
+<!-- ============================================== -->
+<section class="dl-section">
+  <h2>① 网页直接下载 9 个样本 CSV</h2>
+  <p class="desc">每个 ~360 KB, 包含 2000 行 (40 秒 @ 50 Hz). 含 13 列: timestamp + GSR/PPG/HR/IMU 三轴 + SVM/Jerk + patient_id + day + progression.</p>
+
+  <h3 style="font-size:16px; margin: 20px 0 12px; color: var(--accent);">主样本 (4 任务 × P01 Day 0 健康基线)</h3>
+  <div class="dl-grid">
+    <div class="dl-card">
+      <span class="dl-name">walking_normal_P01_day00_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">walking_normal</span>
+        <span class="dl-tag">P01</span>
+        <span class="dl-tag">Day 0 健康</span>
+        349 KB · 2000 行
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_normal_P01_day00_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">walking_dual_task_P01_day00_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">walking_dual_task</span>
+        <span class="dl-tag">P01</span>
+        <span class="dl-tag">Day 0 健康</span>
+        349 KB · 2000 行
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_dual_task_P01_day00_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">balance_standing_P01_day00_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">balance_standing</span>
+        <span class="dl-tag">P01</span>
+        <span class="dl-tag">Day 0 健康</span>
+        353 KB · 2000 行
+      </div>
+      <a class="dl-btn" href="data/downloads/balance_standing_P01_day00_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">hand_fine_motor_P01_day00_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">hand_fine_motor</span>
+        <span class="dl-tag">P01</span>
+        <span class="dl-tag">Day 0 健康</span>
+        353 KB · 2000 行
+      </div>
+      <a class="dl-btn" href="data/downloads/hand_fine_motor_P01_day00_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+  </div>
+
+  <h3 style="font-size:16px; margin: 28px 0 12px; color: var(--accent);">退化对比样本 (walking_normal, 5 个对比 CSV)</h3>
+  <div class="dl-grid">
+    <div class="dl-card">
+      <span class="dl-name">walking_normal_P01_day25_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">P01</span>
+        <span class="dl-tag" style="background:#5C2828;color:#FCA5A5">Day 25 进展</span>
+        362 KB
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_normal_P01_day25_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">walking_normal_P02_day14_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">P02 (低教育)</span>
+        <span class="dl-tag">Day 14 stepwise 跃升</span>
+        355 KB
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_normal_P02_day14_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">walking_normal_P02_day25_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag">P02 (低教育)</span>
+        <span class="dl-tag" style="background:#5C2828;color:#FCA5A5">Day 25 mild AD + BPSD</span>
+        352 KB
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_normal_P02_day25_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">walking_normal_P03_day25_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag" style="background:#1E3A5F;color:#93C5FD">P03 (高教育掩盖)</span>
+        <span class="dl-tag">Day 25</span>
+        355 KB
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_normal_P03_day25_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+    <div class="dl-card">
+      <span class="dl-name">walking_normal_P09_day25_sample.csv</span>
+      <div class="dl-meta">
+        <span class="dl-tag" style="background:#5C2828;color:#FCA5A5">P09 (文盲, 弱储备)</span>
+        <span class="dl-tag">Day 25 急性</span>
+        355 KB
+      </div>
+      <a class="dl-btn" href="data/downloads/walking_normal_P09_day25_sample.csv" download>⬇ 下载 CSV</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================== -->
+<!-- 2. Clone + 本地生成 -->
+<!-- ============================================== -->
+<section class="dl-section">
+  <h2>② Clone Repo + 本地生成完整数据集 (1140 个 CSV, 981 MB)</h2>
+  <p class="desc">用生成器自己跑一遍, 本地输出全部 10 患者 × 4 任务 × 30 天 = 1140 个 sensor CSV.</p>
+
+  <div class="dl-warning">
+    <b>⚠ 为什么不直接放仓库:</b> GitHub 单仓库推荐 &lt; 1 GB, 我们 1140 个 CSV 总共 981 MB 接近上限. 所以代码 + 9 个样本 push, 完整数据集 clone 后 <b>1 行命令本地重生</b>.
+  </div>
+
+  <div class="dl-code-block">
+<span class="comment"># Step 1: Clone repo</span>
+<span class="cmd">git clone https://github.com/Jewelina95/ad-synthetic-generator</span>
+<span class="cmd">cd ad-synthetic-generator</span>
+
+<span class="comment"># Step 2: 装依赖</span>
+<span class="cmd">pip install numpy pandas scipy</span>
+
+<span class="comment"># Step 3: 跑生成器 (默认 10 患者 × 30 天)</span>
+<span class="cmd">python3 src/generate_synthetic.py</span>
+
+<span class="comment"># 自定义: 20 患者 × 90 天</span>
+<span class="cmd">python3 src/generate_synthetic.py --patients 20 --days 90</span>
+
+<span class="comment"># 输出在 data/synthetic/:</span>
+<span class="comment">#   by_patient/  (个体纵向视图)</span>
+<span class="comment">#     P01/sensor/dayXX_TASK.csv   每个 patient 120 文件</span>
+<span class="comment">#   by_task/     (任务为中心, VBVR-style)</span>
+<span class="comment">#     walking_normal/PXX_dayXX.csv   每个任务 300 文件</span>
+  </div>
+</section>
+
+
+<!-- ============================================== -->
+<!-- 3. 输出数据结构 -->
+<!-- ============================================== -->
+<section class="dl-section">
+  <h2>③ 输出数据结构</h2>
+  <p class="desc">本地生成后, <code style="color:var(--accent)">data/synthetic/</code> 目录长这样:</p>
+
+  <div class="dl-code-block">
+<span class="cmd">data/synthetic/</span>
+├── manifest.json                              <span class="comment"># 总览 (10 患者 + 4 任务 + 语音模态说明)</span>
+│
+├── <span class="cmd">by_patient/</span>     <span class="comment"># 视图 1: 个体纵向 (患者视角)</span>
+│   ├── P01/
+│   │   ├── persona.json
+│   │   ├── progression.csv                    <span class="comment"># 30 天 progression 时序</span>
+│   │   ├── ema.jsonl                          <span class="comment"># 90 条 (30 天 × 3 次/天)</span>
+│   │   ├── surveys.jsonl                      <span class="comment"># 5 条 (周一)</span>
+│   │   ├── notes.jsonl                        <span class="comment"># 1 条 (Day 14 月度)</span>
+│   │   ├── bpsd_events.jsonl                  <span class="comment"># BPSD 事件 (0-3 个)</span>
+│   │   └── sensor/
+│   │       ├── day00_walking_normal.csv       <span class="comment"># 完整 30 天 × 4 任务</span>
+│   │       ├── day00_walking_dual_task.csv
+│   │       ├── ...
+│   │       └── day29_hand_fine_motor.csv
+│   ├── P02/
+│   ├── ...
+│   └── P10/
+│
+└── <span class="cmd">by_task/</span>        <span class="comment"># 视图 2: 任务为中心 (VBVR-style)</span>
+    ├── walking_normal/                        <span class="comment"># 10 患者 × 30 天 = 300 CSV</span>
+    │   ├── P01_day00.csv
+    │   ├── P01_day01.csv
+    │   ├── ...
+    │   └── P10_day29.csv
+    ├── walking_dual_task/                     <span class="comment"># 300 CSV</span>
+    ├── balance_standing/                      <span class="comment"># 300 CSV</span>
+    └── hand_fine_motor/                       <span class="comment"># 240 CSV (junkai 缺该任务)</span>
+  </div>
+</section>
+
+
+<!-- ============================================== -->
+<!-- 4. CSV 格式 -->
+<!-- ============================================== -->
+<section class="dl-section">
+  <h2>④ CSV 列格式</h2>
+  <p class="desc">所有 sensor CSV 统一 13 列:</p>
+
+  <div class="dl-code-block">
+<span class="cmd">timestamp</span>            <span class="comment"># ISO 时间戳</span>
+<span class="cmd">gsr_filtered</span>         <span class="comment"># EDA 皮肤电导, 退化模型: × (1-0.2*progression)</span>
+<span class="cmd">ppg_ir</span>               <span class="comment"># PPG 红外原始</span>
+<span class="cmd">hr_bpm_avg</span>           <span class="comment"># 心率, 退化: + 3*progression bpm + 减小变异 (HRV ↓)</span>
+<span class="cmd">imu_ax_mps2</span>          <span class="comment"># IMU 加速度 X 轴 (m/s²)</span>
+<span class="cmd">imu_ay_mps2</span>          <span class="comment"># Y 轴</span>
+<span class="cmd">imu_az_mps2</span>          <span class="comment"># Z 轴</span>
+<span class="cmd">svm</span>                  <span class="comment"># Signal Vector Magnitude = √(ax²+ay²+az²)</span>
+<span class="cmd">jerk</span>                 <span class="comment"># SVM 一阶差分, 退化: × (1+0.7*progression)</span>
+<span class="cmd">hr_valid_flag</span>        <span class="comment"># 心率有效性</span>
+<span class="cmd">label</span>                <span class="comment"># 任务名</span>
+<span class="cmd">patient_id</span>           <span class="comment"># P01..P10 (新增)</span>
+<span class="cmd">day</span>                  <span class="comment"># 0-29 (新增)</span>
+<span class="cmd">progression</span>          <span class="comment"># effective_progression (新增, 患者认知退化度 0-1)</span>
+  </div>
+</section>
+
+
+<!-- ============================================== -->
+<!-- 5. 量表 / EMA / Notes 文件格式 -->
+<!-- ============================================== -->
+<section class="dl-section">
+  <h2>⑤ 其他文件格式</h2>
+
+  <div class="dl-code-block">
+<span class="comment"># surveys.jsonl (周量表, 每周一一条)</span>
+<span class="cmd">{"day": 0, "mmse_estimate": 30.0, "moca_estimate": 26.2, "phq9": 0.0}</span>
+
+<span class="comment"># ema.jsonl (每日 3 次自评)</span>
+<span class="cmd">{"day": 0, "hour": 9, "mood": 7, "sleep_quality": 6, "anxiety": 2, "energy": 7, "bpsd_event": null}</span>
+
+<span class="comment"># bpsd_events.jsonl (BPSD 事件, 按 90% 患病率注入)</span>
+<span class="cmd">{"day": 25, "hour": 13, "type": "agitation", "duration_min": 30, "progression_at_event": 0.8}</span>
+
+<span class="comment"># notes.jsonl (月度临床 note)</span>
+<span class="cmd">{"day": 14, "template": "moderate", "text": "患者 73 岁男性, 认知问题加重..."}</span>
+
+<span class="comment"># progression.csv (30 天进展度)</span>
+day,raw_progression,effective_progression
+0,0.000,0.000
+14,0.500,0.575
+29,0.800,0.920
+  </div>
+</section>
+
+
+<!-- ============================================== -->
+<!-- 6. 直链清单 (cli 友好) -->
+<!-- ============================================== -->
+<section class="dl-section">
+  <h2>⑥ 直链清单 (复制到 wget/curl)</h2>
+  <div class="dl-code-block">
+<span class="comment"># 9 个样本一次性下载</span>
+<span class="cmd">BASE=https://jewelina95.github.io/ad-synthetic-generator/data/downloads</span>
+<span class="cmd">for f in walking_normal_P01_day00_sample.csv \</span>
+         walking_normal_P01_day25_sample.csv \
+         walking_normal_P02_day14_sample.csv \
+         walking_normal_P02_day25_sample.csv \
+         walking_normal_P03_day25_sample.csv \
+         walking_normal_P09_day25_sample.csv \
+         walking_dual_task_P01_day00_sample.csv \
+         balance_standing_P01_day00_sample.csv \
+         hand_fine_motor_P01_day00_sample.csv; do
+   <span class="cmd">curl -O "$BASE/$f"</span>
+done
+  </div>
+</section>
+
+<footer style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:12px; border-top:1px solid var(--border); margin-top:60px;">
+  AD Synthetic Generator v2.2 · Task-Centric · 8 OpenNeuro datasets calibrated · 不需任何申请
+</footer>
+
+<script src="js/common.js"></script>
+<script>
+insertNav('downloads');
+</script>
+</body>
+</html>

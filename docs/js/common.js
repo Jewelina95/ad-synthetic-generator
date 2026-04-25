@@ -16,6 +16,7 @@ function insertNav(activePage) {
     { id: 'method',       label: 'Method',       href: 'method.html' },
     { id: 'tasks',        label: 'Tasks',        href: 'tasks.html' },
     { id: 'patients',     label: 'Patients',     href: 'patients.html' },
+    { id: 'downloads',    label: '📥 Downloads', href: 'downloads.html' },
   ];
   const html = `
     <nav class="nav">
