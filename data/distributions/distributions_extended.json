@@ -1,0 +1,204 @@
+{
+  "_meta": {
+    "purpose": "扩展校准 — 从 7 个已下载 OpenNeuro 数据集提取更多真实分布",
+    "no_application_needed": true,
+    "all_extracted_from_local_participants_tsv": true
+  },
+  "datasets_used": [
+    {
+      "id": "ds004796",
+      "title": "PEARL-Neuro 中年痴呆风险队列",
+      "n_total": 192,
+      "use_case": "SCD/早期阶段 + 风险因素 (APOE/lifestyle) 校准",
+      "extracted": {
+        "age": {
+          "n": 192,
+          "mean": 55.05,
+          "sd": 3.08,
+          "min": 50.0,
+          "max": 63.0
+        },
+        "education": {
+          "n": 174,
+          "mean": 2.74,
+          "sd": 0.65,
+          "min": 1.0,
+          "max": 3.0
+        },
+        "BDI_depression": {
+          "n": 192,
+          "mean": 8.52,
+          "sd": 7.92,
+          "min": 0.0,
+          "max": 39.0
+        },
+        "BMI": {
+          "n": 192,
+          "mean": 26.88,
+          "sd": 4.63,
+          "min": 19.03,
+          "max": 39.04
+        },
+        "RPM_raven_iq": {
+          "n": 192,
+          "mean": 52.79,
+          "sd": 4.54,
+          "min": 33.0,
+          "max": 60.0
+        },
+        "AUDIT_alcohol": {
+          "n": 192,
+          "mean": 3.8,
+          "sd": 3.33,
+          "min": 0.0,
+          "max": 23.0
+        },
+        "CVLT_verbal_learning_5": {
+          "n": 192,
+          "mean": 12.75,
+          "sd": 2.7,
+          "min": 5.0,
+          "max": 16.0
+        },
+        "apoe_distribution": {
+          "e3/e3": 119,
+          "e3/e4": 46,
+          "e3/e2": 19,
+          "e2/e4": 3,
+          "e3/e2 ": 2,
+          "e4/e4": 2,
+          "e2/e2": 1
+        },
+        "apoe_e4_carrier_rate": 0.266
+      }
+    },
+    {
+      "id": "ds002778",
+      "title": "UC San Diego PD vs Healthy",
+      "n_total": 31,
+      "use_case": "AD vs PD 差异诊断 EEG MMSE 对照",
+      "by_group": {
+        "ctrl": {
+          "n": 16,
+          "age": {
+            "n": 16,
+            "mean": 63.5,
+            "sd": 9.67,
+            "min": 50.0,
+            "max": 82.0
+          },
+          "mmse": {
+            "n": 16,
+            "mean": 29.19,
+            "sd": 1.11,
+            "min": 26.0,
+            "max": 30.0
+          },
+          "disease_duration": null
+        },
+        "pd": {
+          "n": 15,
+          "age": {
+            "n": 15,
+            "mean": 63.27,
+            "sd": 8.2,
+            "min": 47.0,
+            "max": 74.0
+          },
+          "mmse": {
+            "n": 15,
+            "mean": 28.93,
+            "sd": 1.03,
+            "min": 26.0,
+            "max": 30.0
+          },
+          "disease_duration": {
+            "n": 15,
+            "mean": 4.53,
+            "sd": 3.52,
+            "min": 1.0,
+            "max": 12.0
+          }
+        }
+      }
+    },
+    {
+      "id": "ds006036",
+      "title": "ds004504 姊妹版 (光刺激 EEG)",
+      "n_total": 88,
+      "use_case": "同 ds004504 88 人 patients, 不同 EEG 范式 (eyes-open + 5/10/15/30 Hz 光刺激). 双范式交叉验证用.",
+      "note": "patients 完全相同 ds004504, MMSE 分布与 ds004504 一致, 不重复抽分布"
+    },
+    {
+      "id": "ds005363",
+      "title": "ORHA 健康老化视觉认知 EEG",
+      "n_total": 43,
+      "use_case": "Y (年轻) vs O (老年) EEG 对照 — 区分'健康老化'和'AD 退化'",
+      "by_group": {
+        "O": {
+          "n": 22,
+          "age": {
+            "n": 22,
+            "mean": 67.41,
+            "sd": 4.39,
+            "min": 60.0,
+            "max": 74.0
+          }
+        },
+        "Y": {
+          "n": 21,
+          "age": {
+            "n": 21,
+            "mean": 25.48,
+            "sd": 4.84,
+            "min": 20.0,
+            "max": 34.0
+          }
+        }
+      }
+    },
+    {
+      "id": "ds005892",
+      "title": "PD-MCI / PD-NC / HC Resting MRI",
+      "n_total": 55,
+      "use_case": "MCI 鉴别诊断 (PD-MCI 与 AD-MCI EEG/fMRI 区别) — 写进 KB 当鉴别条目",
+      "by_group": {
+        "Control": {
+          "n": 22,
+          "age": {
+            "n": 22,
+            "mean": 70.68,
+            "sd": 7.47,
+            "min": 60.0,
+            "max": 85.0
+          }
+        },
+        "PD-MCI": {
+          "n": 15,
+          "age": {
+            "n": 15,
+            "mean": 69.87,
+            "sd": 9.26,
+            "min": 60.0,
+            "max": 94.0
+          }
+        },
+        "PD-NC": {
+          "n": 18,
+          "age": {
+            "n": 18,
+            "mean": 65.94,
+            "sd": 5.24,
+            "min": 60.0,
+            "max": 78.0
+          }
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total_datasets": 5,
+    "all_locally_available": true,
+    "no_waiting": "全部基于已下载的 participants.tsv, 立即可用"
+  }
+}

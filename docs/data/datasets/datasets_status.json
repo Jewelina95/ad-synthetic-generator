@@ -1,0 +1,172 @@
+{
+  "_meta": {
+    "purpose": "数据集分类: 已用 / 待用 / 等申请",
+    "updated": "2026-04-25"
+  },
+  "categories": {
+    "used_for_calibration": {
+      "label": "✅ 已用于生成器校准 (3)",
+      "description": "已提取 participants.tsv 真实分布写入 distributions_master.json, 生成器直接使用",
+      "datasets": [
+        {
+          "id": "ds004504",
+          "title": "EEG AD/FTD/Healthy",
+          "n": 88,
+          "what_extracted": "MMSE 分布 (AD μ=17.75 σ=4.50, FTD μ=22.17 σ=2.64, CTRL μ=30.0)",
+          "used_in": "progression_to_mmse() 直接用"
+        },
+        {
+          "id": "ds007427",
+          "title": "Lopera Colombia AD/MCI/CTR",
+          "n": 138,
+          "what_extracted": "MCI MMSE 分布 + 风险组",
+          "used_in": "和 ds004504 合并 n=112 综合分布"
+        },
+        {
+          "id": "ds006095",
+          "title": "Older Adults Walking",
+          "n": 71,
+          "what_extracted": "MOCA 分布 (μ=27.45 σ=1.60)",
+          "used_in": "progression_to_moca() 直接用"
+        }
+      ]
+    },
+    "downloaded_not_yet_used": {
+      "label": "📦 已下载未用 (7) — 立即可加入校准",
+      "description": "已 git clone 拿到 metadata, participants.tsv 在本地, 随时可提取分布加入生成器. 不需要等任何申请.",
+      "datasets": [
+        {
+          "id": "ds004796",
+          "title": "PEARL-Neuro (中年痴呆风险)",
+          "n": 192,
+          "modality": "EEG + fMRI + APOE + 生活方式",
+          "available_signals": "APOE 基因型分布 / BDI 抑郁分 / NEO 人格 / CVLT 言语学习 / 完整血液生化",
+          "potential_use": "加入 SCD/早期风险阶段 persona 建模 (现在 5 种 progression 模式没用 APOE)",
+          "blocker": "无 — 随时可加, 我没加是因为优先级低"
+        },
+        {
+          "id": "ds002778",
+          "title": "UC San Diego PD vs Healthy EEG",
+          "n": 31,
+          "modality": "Resting EEG + MMSE + UPDRS",
+          "available_signals": "PD vs Healthy EEG 标志物 + MMSE",
+          "potential_use": "AD vs PD 鉴别诊断条目 → 写进 KnowledgeStore 让 ClinicalAgent 用",
+          "blocker": "无 — 不进生成器, 进 KB"
+        },
+        {
+          "id": "ds006036",
+          "title": "ds004504 姊妹版 (eyes-open + 光刺激)",
+          "n": 88,
+          "modality": "Same patients as ds004504, 不同范式",
+          "potential_use": "未来加 EEG 标志物时双范式 cross-validation",
+          "blocker": "无, 但同人不增样本"
+        },
+        {
+          "id": "ds005363",
+          "title": "ORHA 健康老化视觉 EEG",
+          "n": 62,
+          "modality": "Visual EEG, 健康老人",
+          "potential_use": "年龄 baseline 参考 (健康老化 vs AD 退化区分)",
+          "blocker": "无"
+        },
+        {
+          "id": "ds005892",
+          "title": "PD-NC vs PD-MCI vs HC fMRI",
+          "n": "未确认",
+          "modality": "Resting state fMRI",
+          "potential_use": "MCI 鉴别诊断知识 (PD-MCI 与 AD-MCI 区别)",
+          "blocker": "无"
+        },
+        {
+          "id": "ds006466",
+          "title": "HeartBEAM Older Adult EEG",
+          "n": "未确认 (participants.tsv 空)",
+          "modality": "Resting + auditory oddball",
+          "potential_use": "后期备用",
+          "blocker": "participants.tsv 元数据空, 信息有限"
+        },
+        {
+          "id": "MultiConAD",
+          "title": "多语言 AD 对话代码 (16 数据集统一)",
+          "n": "代码 only",
+          "modality": "Voice/text dialogue",
+          "potential_use": "提取中文 AD 语言学特征分布 (停顿率/TTR/语速) → 标定 Audio Agent 阈值",
+          "blocker": "代码已下, 但实际数据需通过 DementiaBank/iFlytek 申请 (见下面"等申请"组)"
+        }
+      ]
+    },
+    "pending_application": {
+      "label": "⏳ 等申请中 (5) — 各有具体审批理由",
+      "description": "这些数据集都需要正式申请, 因为含真实患者临床数据, 涉及 IRB/隐私/数据使用协议. 不是技术阻碍, 是法规阻碍.",
+      "datasets": [
+        {
+          "id": "WearGait-PD",
+          "title": "Wearables Gait PD vs Healthy",
+          "n": "100 PD + 85 Healthy",
+          "host": "Synapse (SAGE Bionetworks)",
+          "url": "https://www.synapse.org/Synapse:syn52540892",
+          "wait_reason": "需要 Synapse 账号注册 + 同意 Synapse Pledge (数据使用规范). 涉及 IRB 通过的真实患者步态数据.",
+          "wait_time": "1-7 天 (通常 1-3 天)",
+          "user_action_needed": "注册 Synapse → 同意条款 → 申请 syn52540892 数据访问",
+          "why_we_want": "★ 100+85 IMU 真实步态分布, 你手套硬件最对口, 用于直接验证合成 IMU 退化幅度",
+          "current_status": "用户在注册"
+        },
+        {
+          "id": "ADReSS",
+          "title": "Alzheimer's Dementia Recognition through Spontaneous Speech",
+          "n": "~150 人对话",
+          "host": "DementiaBank (TalkBank)",
+          "url": "https://dementia.talkbank.org/access/",
+          "wait_reason": "需要学术邮箱 + DementiaBank 学术会员资格. 是真实痴呆患者的语音录音, 隐私敏感, 需 IRB-approved 学术使用承诺.",
+          "wait_time": "1-3 天",
+          "user_action_needed": "学术邮箱申请 → 等待审核",
+          "why_we_want": "AD 语音 baseline (英文为主, 你 Audio Agent 的对照)",
+          "current_status": "未申请"
+        },
+        {
+          "id": "MultiConAD-data",
+          "title": "MultiConAD 实际数据 (16 数据集统一后)",
+          "n": "16 个原数据集集合",
+          "host": "GitHub 代码 + 各原数据源分别申请",
+          "url": "https://github.com/ArezoShakeri/MultiConAD",
+          "wait_reason": "代码已开源 (不需等), 但实际数据要从 16 个源数据集分别申请: DementiaBank (Pitt/Lu/Baycrest 等英文) + iFlytek (中文挑战赛) + NCMMSC2021 (中文) + TAUKADIAL. 每个有独立审批.",
+          "wait_time": "邮件作者最快 (1-7 天), 单独申请每个 1-4 周",
+          "user_action_needed": "邮件 Arezo Shakeri 索取统一后的数据集 (最快路径)",
+          "why_we_want": "★★★ 中文 AD 对话 (TAUKADIAL/iFlytek/NCMMSC2021), 你项目"中文/方言"卖点的关键数据",
+          "current_status": "代码已下, 数据待邮件作者"
+        },
+        {
+          "id": "OASIS-3",
+          "title": "Open Access Series of Imaging Studies",
+          "n": "1098 纵向 30 年队列",
+          "host": "WUSTL OASIS Brains",
+          "url": "https://sites.wustl.edu/oasisbrains/",
+          "wait_reason": "WUSTL 需研究目的 + IRB 审批. 真实纵向 MRI + 临床数据, 涉及多个 IRB approvals.",
+          "wait_time": "1-2 周",
+          "user_action_needed": "网页注册 → 填申请表 → IRB 审批",
+          "why_we_want": "真实纵向轨迹 (我们 progression 模式现在拍的, 拿到这个可严格拟合)",
+          "current_status": "未申请, 建议 paper draft 阶段再申请"
+        },
+        {
+          "id": "ADNI",
+          "title": "Alzheimer's Disease Neuroimaging Initiative",
+          "n": "数千人, 4 期纵向",
+          "host": "LONI (USC)",
+          "url": "https://adni.loni.usc.edu/",
+          "wait_reason": "LONI ESN 委员会评审 + 详细研究计划 + IRB. 全球 AD 金标准库, 严格审批.",
+          "wait_time": "4-8 周",
+          "user_action_needed": "提交英文研究计划 → 委员会评审",
+          "why_we_want": "Paper 必引 (金标准对照), 但你不用做实验",
+          "current_status": "不建议现在申请 (审批太长, 不如等 paper draft)"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_known": 15,
+    "used": 3,
+    "downloaded_not_used": 7,
+    "pending": 5,
+    "key_insight": "已下载的 7 个完全可以立刻用 — 不是技术或法规阻碍, 只是优先级排到后面. 等申请的 5 个全部因为是真实患者数据涉及 IRB/隐私/审批, 不是我们能加速的."
+  }
+}
