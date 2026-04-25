@@ -877,3 +877,173 @@ code { background: var(--bg-elev-2); padding: 2px 6px; border-radius: 4px; color
   .stat-row { grid-template-columns: 1fr 1fr; }
   .pc-mini-charts { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ============================================================
+   TASK CSV DOWNLOAD BUTTONS / LIST  (tasks.html)
+   ============================================================ */
+.task-dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(94,234,212,0.10);
+  border: 1px solid rgba(94,234,212,0.35);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.task-dl-btn:hover {
+  background: rgba(94,234,212,0.20);
+  border-color: rgba(94,234,212,0.65);
+  transform: translateY(-1px);
+}
+.task-dl-icon { font-size: 0.85rem; line-height: 1; }
+.task-dl-label { letter-spacing: 0.04em; }
+
+.task-dl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.task-dl-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-1);
+  border-radius: var(--radius-md, 8px);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.task-dl-row:hover {
+  border-color: rgba(94,234,212,0.45);
+  background: rgba(94,234,212,0.06);
+  transform: translateX(2px);
+}
+.task-dl-row .task-dl-icon { color: var(--accent); font-size: 1.0rem; }
+.task-dl-row .task-dl-name {
+  color: var(--text);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.task-dl-row .task-dl-meta {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+}
+.task-dl-row .task-dl-size {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  background: rgba(94,234,212,0.08);
+  border: 1px solid rgba(94,234,212,0.25);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+@media (max-width: 640px) {
+  .task-dl-row { grid-template-columns: 22px 1fr auto; }
+  .task-dl-row .task-dl-meta { display: none; }
+}
+
+/* ============================================================
+   DATASET STATUS PANEL  (data-sources.html)
+   ============================================================ */
+.ds-status-panel {
+  background: var(--bg-elev-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+.ds-status-headline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+.ds-status-headline .pill-ok {
+  background: rgba(94,234,212,0.12);
+  border: 1px solid rgba(94,234,212,0.45);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.ds-status-bullet {
+  margin: 6px 0 14px;
+  padding: 12px 14px;
+  border-left: 3px solid rgba(94,234,212,0.45);
+  background: rgba(94,234,212,0.04);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.ds-status-bullet small {
+  display: block;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.ds-status-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.88rem;
+}
+.ds-status-tbl th, .ds-status-tbl td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.ds-status-tbl th {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  font-weight: 600;
+  background: var(--bg-elev-2);
+}
+.ds-status-tbl tr:last-child td { border-bottom: none; }
+.ds-status-tbl td.mono { font-family: var(--font-mono); color: var(--accent); }
+.ds-status-tbl .row-used td { background: rgba(94,234,212,0.03); }
+.ds-status-tbl .badge-ok {
+  display: inline-block;
+  background: rgba(94,234,212,0.12);
+  border: 1px solid rgba(94,234,212,0.40);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.ds-status-tbl .badge-pause {
+  display: inline-block;
+  background: rgba(255,200,120,0.10);
+  border: 1px solid rgba(255,200,120,0.35);
+  color: #f0b97a;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.ds-status-footer {
+  margin-top: 16px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+.ds-status-footer b { color: var(--text); }

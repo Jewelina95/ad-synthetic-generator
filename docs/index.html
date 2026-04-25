@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AD 多模态合成数据生成器 &middot; Overview</title>
-  <meta name="description" content="基于真实可穿戴 baseline 与 5 个 OpenNeuro 数据集 (n=112) 校准的 AD 合成患者数据生成器, 任务为中心 (VBVR-style) 输出." />
+  <meta name="description" content="基于真实可穿戴 baseline 与 8 个 OpenNeuro 数据集 (n=672+) 校准的 AD 合成患者数据生成器, 任务为中心 (VBVR-style) 输出." />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
@@ -16,7 +16,7 @@
     <span class="hero-tag">v2.2 &middot; task-centric (VBVR-aligned) &middot; calibrated by real distributions</span>
     <h1>AD 多模态合成<br />患者数据生成器</h1>
     <p class="hero-sub">
-      Calibrated by real distributions from 5 OpenNeuro datasets (n=112).
+      Calibrated by real distributions from <b>8 OpenNeuro datasets (n=672+)</b> — 3 主校准 (MMSE/MoCA, n=297) + 5 扩展校准 (APOE / 差异诊断 / 老化对照, n=375).
       生成 30 天纵向 sensor / EMA / 量表 / 临床 note / BPSD 事件 — 跨模态一致, 分布对齐真实老年与 AD 队列.
       v2.2 引入 <b>任务为中心</b> 输出结构 (10 patients × 4 tasks × 30 days).
     </p>
@@ -36,8 +36,8 @@
         <div class="stat-label">纵向轨迹长度</div>
       </div>
       <div class="stat">
-        <div class="stat-num">112<small> real</small></div>
-        <div class="stat-label">分布校准样本</div>
+        <div class="stat-num">8<small> datasets</small></div>
+        <div class="stat-label">OpenNeuro 校准源 (n=672+)</div>
       </div>
     </div>
   </div>
@@ -62,7 +62,7 @@
         </div>
         <div class="arch-box">
           <strong>OpenNeuro 公开数据集</strong>
-          <small>5 个数据集, n=112 真实患者分布</small>
+          <small>8 个数据集 (3 主 + 5 扩展), n=672+ 真实分布</small>
         </div>
         <div class="arch-box">
           <strong>临床专家知识</strong>
@@ -160,7 +160,7 @@
       <a href="data-sources.html" class="card">
         <div class="card-icon">&#x21A6;</div>
         <h3>Data Sources</h3>
-        <p>查看 5 个 OpenNeuro 数据集与真实分布可视化.</p>
+        <p>查看 8 个 OpenNeuro 数据集与真实分布可视化 (3 主 + 5 扩展, 全部已下载).</p>
       </a>
       <a href="method.html" class="card">
         <div class="card-icon">&#x21A6;</div>

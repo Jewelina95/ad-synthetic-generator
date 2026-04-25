@@ -14,7 +14,7 @@
     <div class="eyebrow">Data Sources</div>
     <h1 style="font-size: 2.2rem;">真实数据 &middot; 三类来源</h1>
     <p class="section-sub">
-      生成器不是从噪声起步, 而是从两类真实信号校准: (1) 4 名健康受试者真实可穿戴 baseline; (2) 5 个 OpenNeuro 公开数据集, n=112 真实 AD/MCI/老年患者用于分布对齐.
+      生成器不是从噪声起步, 而是从两类真实信号校准: (1) 4 名健康受试者真实可穿戴 baseline; (2) <b>8 个 OpenNeuro 公开数据集</b> (3 主校准 n=297 + 5 扩展 n=375, 总 n=672+) 真实 AD/MCI/老年/PD/中年风险患者用于分布对齐. <span class="faint">下面 5 张卡片是主校准源详细介绍, 8 个数据集全景见本页第 4 节.</span>
     </p>
   </div>
 </section>
@@ -48,6 +48,18 @@
     <h2 class="section-title">2. OpenNeuro 公开数据集</h2>
     <p class="section-sub">用于校准合成患者分布的 5 个开源队列. 涵盖 AD / FTD / MCI / 老年 / PD 共 n=560+ 受试者. <span class="faint">点击任一卡片查看完整介绍 / 真实样本 / 我们怎么用它 / 代码片段.</span></p>
     <div class="grid-2" id="dsCards"><!-- filled by JS --></div>
+  </div>
+</section>
+
+<!-- DATASET STATUS PANEL -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <h2 class="section-title">📦 已下载数据集全景</h2>
+    <p class="section-sub">8 个数据集全部已下载并使用 — 不需要等任何申请. 真实分布全部从本地 <span class="mono">participants.tsv</span> 提取写入 <span class="mono">distributions_master.json</span> + <span class="mono">distributions_extended.json</span>.</p>
+
+    <div class="ds-status-panel" id="dsStatusPanel">
+      <div class="muted">Loading dataset status…</div>
+    </div>
   </div>
 </section>
 

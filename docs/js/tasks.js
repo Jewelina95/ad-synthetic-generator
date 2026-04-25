@@ -38,6 +38,35 @@ const TASK_META = {
 
 const TASK_ORDER = ['walking_normal', 'walking_dual_task', 'balance_standing', 'hand_fine_motor'];
 
+/* Sample CSV downloads (~360 KB each, first 40s of day = 2000 rows @ 50Hz).
+   walking_normal has 8 cross-comparison samples (Day 0/25 + multiple patients);
+   other tasks have a single P01 day00 sample. */
+const SAMPLE_DOWNLOADS = {
+  walking_normal: [
+    { file: 'walking_normal_P01_day00_sample.csv', label: 'P01 · Day 00 (baseline)',    size: '349 KB' },
+    { file: 'walking_normal_P01_day25_sample.csv', label: 'P01 · Day 25 (progression)', size: '362 KB' },
+    { file: 'walking_normal_P02_day14_sample.csv', label: 'P02 · Day 14',               size: '355 KB' },
+    { file: 'walking_normal_P02_day25_sample.csv', label: 'P02 · Day 25',               size: '352 KB' },
+    { file: 'walking_normal_P03_day25_sample.csv', label: 'P03 · Day 25',               size: '355 KB' },
+    { file: 'walking_normal_P09_day25_sample.csv', label: 'P09 · Day 25',               size: '354 KB' },
+  ],
+  walking_dual_task: [
+    { file: 'walking_dual_task_P01_day00_sample.csv', label: 'P01 · Day 00', size: '349 KB' },
+  ],
+  balance_standing: [
+    { file: 'balance_standing_P01_day00_sample.csv', label: 'P01 · Day 00', size: '353 KB' },
+  ],
+  hand_fine_motor: [
+    { file: 'hand_fine_motor_P01_day00_sample.csv', label: 'P01 · Day 00', size: '353 KB' },
+  ],
+};
+
+/** Returns the primary (P01 day00) sample download for a task, or null. */
+function primarySampleFor(taskId) {
+  const list = SAMPLE_DOWNLOADS[taskId] || [];
+  return list.find(s => /P01_day00/.test(s.file)) || list[0] || null;
+}
+
 let TASK_CACHE = null;
 
 /* -------------- ENTRY -------------- */
@@ -99,6 +128,18 @@ async function renderTasksPage() {
 
 function buildTaskCard(t) {
   const meta = TASK_META[t.task_id] || { icon: '📊', short_zh: t.name_zh, desc: '' };
+  const sample = primarySampleFor(t.task_id);
+  const dlBtn = sample ? `
+      <a class="task-dl-btn"
+         href="data/downloads/${sample.file}"
+         download
+         title="下载样本 CSV (${sample.label}, ${sample.size})"
+         onclick="event.stopPropagation();">
+        <span class="task-dl-icon">⬇</span>
+        <span class="task-dl-label">CSV</span>
+      </a>
+  ` : '';
+
   const card = document.createElement('div');
   card.className = 'ds-card';
   card.dataset.taskId = t.task_id;
@@ -108,7 +149,10 @@ function buildTaskCard(t) {
         <span style="font-size: 1.6rem;">${meta.icon}</span>
         <span class="ds-id">${t.task_id}</span>
       </div>
-      <span class="ds-n">${t.n_patients} patients</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="ds-n">${t.n_patients} patients</span>
+        ${dlBtn}
+      </div>
     </div>
     <h4>${t.name_zh} <span class="faint" style="font-weight:400; font-size:.85rem;">— ${meta.short_zh}</span></h4>
     <p>${meta.desc}</p>
@@ -182,6 +226,28 @@ function openTaskModal(taskId) {
     </div>
   `;
 
+  // Download samples for this task
+  const samples = SAMPLE_DOWNLOADS[taskId] || [];
+  const isWalkingNormal = taskId === 'walking_normal';
+  const downloadHeader = isWalkingNormal
+    ? `<h4>📥 下载样本数据 CSV <span class="faint" style="font-weight:400; font-size:.85rem;">— ${samples.length} 个对比样本 (Day 0/25 + 多 patient)</span></h4>`
+    : `<h4>📥 下载样本数据 CSV</h4>`;
+  const downloadList = samples.length ? `
+    <div class="task-dl-list">
+      ${samples.map(s => `
+        <a class="task-dl-row" href="data/downloads/${s.file}" download>
+          <span class="task-dl-icon">⬇</span>
+          <span class="task-dl-name mono">${s.file}</span>
+          <span class="task-dl-meta">${s.label}</span>
+          <span class="task-dl-size">${s.size}</span>
+        </a>
+      `).join('')}
+    </div>
+    <p class="muted" style="margin-top: 10px; font-size: 0.85rem; line-height: 1.55;">
+      样本只取每天前 40 秒 (2000 行 @ 50Hz) 演示用. 完整 30 天 × 50Hz × 60s 数据需本地跑生成器输出.
+    </p>
+  ` : '<div class="muted">No sample download available for this task.</div>';
+
   body.innerHTML = `
     <div class="modal-section">
       <h4>Task description</h4>
@@ -189,6 +255,11 @@ function openTaskModal(taskId) {
       <div class="ds-tag-row" style="margin-top: 8px;">
         ${(meta.column_focus || []).map(c => `<span class="ds-badge">${c}</span>`).join('')}
       </div>
+    </div>
+
+    <div class="modal-section">
+      ${downloadHeader}
+      ${downloadList}
     </div>
 
     <div class="modal-section">

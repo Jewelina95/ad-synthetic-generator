@@ -51,6 +51,99 @@ async function renderDataSources() {
 
   // 3. Distribution plots
   drawDistributionPlots(dist);
+
+  // 4. Downloaded-datasets status panel (8 datasets, all locally available)
+  renderDatasetStatusPanel().catch((err) => {
+    const el = document.getElementById('dsStatusPanel');
+    if (el) el.innerHTML = `<div class="muted">Failed to load datasets_status.json: ${esc(err.message || err)}</div>`;
+  });
+}
+
+/* ----------------------------------------------------------------
+   DOWNLOADED-DATASETS STATUS PANEL  (8 datasets all in-use)
+---------------------------------------------------------------- */
+
+/** Custom use-case labels per dataset id for the status table.
+    Keep consistent with distributions_extended.json. */
+const STATUS_USECASE = {
+  ds004504: { use: 'MMSE 真实分布 (AD/FTD/CTRL n=88)', tag: '主校准源' },
+  ds007427: { use: 'MCI MMSE + 风险组 (n=138)',         tag: '主校准源' },
+  ds006095: { use: 'MoCA + Age 老年队列 (n=71)',         tag: '主校准源' },
+  ds004796: { use: '中年风险 / APOE e4 26.6% / BDI / BMI (n=192)', tag: '扩展校准' },
+  ds002778: { use: 'AD vs PD 差异诊断 EEG MMSE (n=31)', tag: '扩展校准' },
+  ds006036: { use: '双范式交叉验证 (同 ds004504 patients, n=88)', tag: '扩展校准' },
+  ds005363: { use: 'ORHA Y vs O 健康老化对照 (n=43)',    tag: '扩展校准' },
+  ds005892: { use: 'PD-MCI / PD-NC / HC MCI 鉴别 (n=55)', tag: '扩展校准' },
+};
+
+/** Datasets to render in the panel, in order. */
+const STATUS_ORDER = [
+  'ds004504', 'ds007427', 'ds006095',  // primary
+  'ds004796', 'ds002778', 'ds006036', 'ds005363', 'ds005892',  // extended
+];
+
+async function renderDatasetStatusPanel() {
+  const status = await fetchJSON('data/datasets/datasets_status.json');
+  const el = document.getElementById('dsStatusPanel');
+  if (!el) return;
+
+  // Flatten primary + extended into a single lookup.
+  const lookup = {};
+  for (const cat of Object.values(status.categories || {})) {
+    for (const d of (cat.datasets || [])) {
+      lookup[d.id] = d;
+    }
+  }
+
+  const rows = STATUS_ORDER.map((id) => {
+    const d = lookup[id] || {};
+    const u = STATUS_USECASE[id] || { use: '—', tag: '—' };
+    const isPrimary = u.tag === '主校准源';
+    return `
+      <tr class="row-used">
+        <td class="mono">${esc(id)}</td>
+        <td>${esc(d.title || '—')}</td>
+        <td>${esc(d.n != null ? d.n : '—')}</td>
+        <td>${esc(u.use)}</td>
+        <td><span class="badge-ok">${isPrimary ? '✓ 主校准' : '✓ 已用扩展'}</span></td>
+      </tr>
+    `;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="ds-status-headline">
+      <span class="pill-ok">8 / 8 在用</span>
+      <span>所有数据集已下载并接入校准 pipeline — <b>不需要等任何申请</b></span>
+    </div>
+
+    <div class="ds-status-bullet">
+      <b>✅ 主校准源 (3):</b> ds004504 / ds007427 / ds006095
+      <small>→ MMSE + MoCA 真实分布写入 distributions_master.json</small>
+    </div>
+
+    <div class="ds-status-bullet">
+      <b>✅ 扩展校准 (5):</b> ds004796 / ds002778 / ds006036 / ds005363 / ds005892
+      <small>→ 中年风险分布 / 差异诊断 / 双范式 / 老化对照 / MCI 鉴别 — distributions_extended.json</small>
+    </div>
+
+    <table class="ds-status-tbl">
+      <thead>
+        <tr>
+          <th>Dataset ID</th>
+          <th>Title</th>
+          <th>n</th>
+          <th>用途</th>
+          <th>状态</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="ds-status-footer">
+      <b>未来扩展:</b> 真实 AD 患者数据集 (WearGait-PD / ADReSS / OASIS-3 / ADNI 等) 在用户授权后通过 IRB 申请获取.
+      <b>当前不需要</b> — 已用 8 个数据集足够支撑生成器校准 (n=672+ 真实受试者覆盖 AD/FTD/MCI/老年/PD/中年风险).
+    </div>
+  `;
 }
 
 /* ----------------------------------------------------------------
