@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Method &middot; AD Synthetic Data Generator</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+<section class="section" style="padding-top: 70px;">
+  <div class="container">
+    <div class="eyebrow">Method</div>
+    <h1 style="font-size: 2.2rem;">生成器内部逻辑</h1>
+    <p class="section-sub">
+      生成器是 4 层嵌套循环, 由一个 progression ∈ [0,1] 变量贯穿全部模态. progression 形态决定退化曲线, 退化系数同时调制传感器统计 / EMA 情绪 / 量表分数 / note 模板, 实现跨模态一致性.
+    </p>
+  </div>
+</section>
+
+<!-- 4-LAYER NESTING -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <h2 class="section-title">1. 4 层嵌套结构</h2>
+    <p class="section-sub">每个虚拟 patient 的所有数据都从这棵树展开 — 自上而下传递 progression, 自下而上聚合一致性.</p>
+    <div class="layer-stack">
+      <div class="layer">
+        <div class="layer-name">L1 · Persona</div>
+        <div class="layer-desc">5 名虚拟患者. 配置 age / gender / education / progression_pattern / cognitive_reserve / bpsd_prone.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-name">L2 · Day  (× 30)</div>
+        <div class="layer-desc">逐日 progression(t) 由 pattern 计算 → 乘以 reserve_factor → effective_progression.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-name">L3 · Modality</div>
+        <div class="layer-desc">{Sensor, EMA, Survey, Note, BPSD} — 每个模态从同一 progression 派生.</div>
+      </div>
+      <div class="layer">
+        <div class="layer-name">L4 · Sample</div>
+        <div class="layer-desc">具体样本: 一段 60 s sensor segment / 一条 EMA / 一次量表填答 / 一条临床 note.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESSION PATTERNS -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">2. 5 种 progression 模式</h2>
+    <p class="section-sub">每位 persona 被分配一种 progression 形态, 描述 30 天内退化的形状. effective_progression = raw × cognitive_reserve.</p>
+    <div class="plot-frame">
+      <div class="plot-title"><b>30 天 effective_progression (5 模式)</b><span class="faint mono">真实数据 from data/patients/P0X/progression.csv</span></div>
+      <div id="progressionPlot" style="height: 420px;"></div>
+    </div>
+
+    <div class="grid-3 mt-3">
+      <div class="card"><div class="card-icon">/</div><h3>Linear</h3><p>逐日均匀退化, 无明显事件. P01 (edu=12, reserve=0.85).</p></div>
+      <div class="card"><div class="card-icon">⇗</div><h3>Stepwise</h3><p>稳定 → 跳到下台阶. P02 (edu=6, reserve=1.15, 显症).</p></div>
+      <div class="card"><div class="card-icon">⌢</div><h3>Plateau</h3><p>初期下降后稳定. P03 (edu=16, reserve=0.65, 高储备掩盖).</p></div>
+      <div class="card"><div class="card-icon">∿</div><h3>Fluctuation</h3><p>日间波动叠加慢退化. P04 (BPSD prone).</p></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>Acute Event</h3><p>急性事件 (跌倒/谵妄) 后陡降. P05.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEGRADATION COEFFICIENTS -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">3. 退化系数表 (sensor)</h2>
+    <p class="section-sub">设 p = effective_progression. 每条 baseline 统计量按下表线性调制, 系数取自李医生访谈与文献先验.</p>
+    <table class="tbl">
+      <thead>
+        <tr><th>模态</th><th>统计量</th><th>调制公式</th><th>方向</th><th>临床解释</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>IMU</td><td class="mono">svm_std</td>          <td class="mono">× (1 + 0.5 p)</td>     <td>↑</td><td>步态变异度增加</td></tr>
+        <tr><td>IMU</td><td class="mono">jerk</td>             <td class="mono">× (1 + 0.7 p)</td>     <td>↑</td><td>动作不平稳</td></tr>
+        <tr><td>IMU</td><td class="mono">step_freq</td>        <td class="mono">× (1 - 0.2 p)</td>     <td>↓</td><td>步频减慢</td></tr>
+        <tr><td>PPG</td><td class="mono">hr_std (HRV)</td>     <td class="mono">× (1 - 0.3 p)</td>     <td>↓</td><td>HRV 衰退 (autonomic)</td></tr>
+        <tr><td>PPG</td><td class="mono">hr_mean (静息)</td>   <td class="mono">+ 4·p</td>             <td>↑</td><td>静息心率轻度升高</td></tr>
+        <tr><td>EDA</td><td class="mono">gsr_mean</td>         <td class="mono">× (1 - 0.2 p)</td>     <td>↓</td><td>皮肤电反应减弱</td></tr>
+        <tr><td>EDA</td><td class="mono">scr_count</td>        <td class="mono">× (1 - 0.4 p)</td>     <td>↓</td><td>SCR 频次降低</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- BPSD FLOW -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">4. BPSD 事件注入流程</h2>
+    <p class="section-sub">90% 患病率的行为精神症状 (Behavioral and Psychological Symptoms of Dementia) 按 progression-conditional 概率插入. 触发当日 EMA mood / anxiety 与 sensor HR 同步异常.</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-step-num">01</div>
+        <div class="flow-step-title">采样</div>
+        <div class="flow-step-desc">每日 P(event) = 0.05 + 0.3 · p · bpsd_prone</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">02</div>
+        <div class="flow-step-title">类型抽取</div>
+        <div class="flow-step-desc">{wandering, agitation, sleep_disturb, hallucination}</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">03</div>
+        <div class="flow-step-title">时长 / 时点</div>
+        <div class="flow-step-desc">duration ~ N(30, 15) min, hour ∈ [13, 17] (sundowning)</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">04</div>
+        <div class="flow-step-title">跨模态写入</div>
+        <div class="flow-step-desc">EMA anxiety↑ + HR↑ + IMU 异常活动 (wandering)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COGNITIVE RESERVE -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">5. 认知储备机制</h2>
+    <p class="section-sub">教育年限 (edu) 决定 cognitive_reserve_factor. 高储备掩盖症状 (effective_progression &lt; raw_progression), 低储备显症提前. 模型自 Stern 2002 储备假说.</p>
+
+    <table class="tbl">
+      <thead><tr><th>Education (yrs)</th><th>Reserve factor</th><th>临床效果</th><th>本项目示例</th></tr></thead>
+      <tbody>
+        <tr><td>16+</td><td class="mono">0.65</td><td>强 — 量表落点低估真实病理</td><td>P03 (大学)</td></tr>
+        <tr><td>12</td> <td class="mono">0.85</td><td>中等 — 接近 raw progression</td><td>P01, P05</td></tr>
+        <tr><td>9</td>  <td class="mono">1.00</td><td>对照基准</td><td>P04</td></tr>
+        <tr><td>≤6</td> <td class="mono">1.15</td><td>弱 — 症状提前显化</td><td>P02 (小学)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="plot-frame mt-3">
+      <div class="plot-title"><b>认知储备效应示意</b><span class="faint mono">同一 raw progression 在不同 reserve 下的实际表现</span></div>
+      <div id="reservePlot" style="height: 320px;"></div>
+    </div>
+  </div>
+</section>
+
+<script src="js/common.js"></script>
+<script src="js/method.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    insertNav('method');
+    insertFooter();
+    renderMethod();
+  });
+</script>
+
+</body>
+</html>

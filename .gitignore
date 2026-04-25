@@ -1,0 +1,19 @@
+# 大数据文件 (sensor CSV) 不推 git
+data/synthetic/*/sensor/
+
+# 真实健康 baseline 也较大 + 是私人数据
+data/baseline/cleaned/*.csv
+data/baseline/data/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

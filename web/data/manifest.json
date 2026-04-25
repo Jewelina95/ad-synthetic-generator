@@ -1,0 +1,89 @@
+{
+  "version": "v2.1",
+  "n_days": 30,
+  "n_patients": 5,
+  "features": [
+    "longitudinal trajectory",
+    "real distribution calibration (n=112 MMSE, n=71 MOCA)",
+    "cross-modal coherence (sensor/EMA/survey/note from same progression)",
+    "BPSD episode injection",
+    "missing data + motion artifacts",
+    "cognitive reserve adjustment"
+  ],
+  "personas": [
+    {
+      "persona": "P01",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 2,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P02",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 1,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P03",
+      "n_days": 30,
+      "n_sensor_files": 90,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing"
+      ]
+    },
+    {
+      "persona": "P04",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 1,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P05",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    }
+  ]
+}

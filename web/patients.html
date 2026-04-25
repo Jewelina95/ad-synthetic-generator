@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patients &middot; AD Synthetic Data Generator</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+<section class="section" style="padding-top: 70px;">
+  <div class="container">
+    <div class="eyebrow">Patient Gallery</div>
+    <h1 style="font-size: 2.2rem;">5 名虚拟 AD 患者</h1>
+    <p class="section-sub">
+      点击任一患者卡片查看完整 30 天纵向轨迹: progression / EMA 时间序列 / MMSE-MoCA-PHQ9 量表 / BPSD 事件全部细节 / 临床 note 全文.
+    </p>
+
+    <div id="patientGrid" class="patient-grid">
+      <!-- patient cards rendered by JS -->
+      <div class="muted">Loading patient data...</div>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow" id="modalEyebrow">Patient Detail</div>
+        <h2 id="modalTitle" style="margin: 0; font-size: 1.4rem;">Patient</h2>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/patients.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    insertNav('patients');
+    insertFooter();
+    renderPatientsPage();
+  });
+</script>
+
+</body>
+</html>

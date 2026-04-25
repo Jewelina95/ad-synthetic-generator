@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AD 多模态合成数据生成器 &middot; Overview</title>
+  <meta name="description" content="基于真实可穿戴 baseline 与 5 个 OpenNeuro 数据集 (n=112) 校准的 AD 合成患者数据生成器." />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="hero-tag">v2.1 &middot; calibrated by real distributions</span>
+    <h1>AD 多模态合成<br />患者数据生成器</h1>
+    <p class="hero-sub">
+      Calibrated by real distributions from 5 OpenNeuro datasets (n=112).
+      生成 30 天纵向 sensor / EMA / 量表 / 临床 note / BPSD 事件 — 跨模态一致, 分布对齐真实老年与 AD 队列.
+    </p>
+
+    <!-- KEY STATS -->
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num">5<small> patients</small></div>
+        <div class="stat-label">虚拟 AD 患者</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">30<small> days</small></div>
+        <div class="stat-label">纵向轨迹长度</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">112<small> real</small></div>
+        <div class="stat-label">分布校准样本</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4<small> modalities</small></div>
+        <div class="stat-label">Sensor + EMA + 量表 + Note</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section">
+  <div class="container">
+    <div class="eyebrow">System Architecture</div>
+    <h2 class="section-title">三源校准, 一体生成</h2>
+    <p class="section-sub">
+      生成器 v2.1 把三类信号融合: 真实健康可穿戴 baseline + 公开 AD/老年队列分布 + 临床专家知识. 所有合成轨迹共享同一进展度变量, 保证跨模态自洽.
+    </p>
+
+    <div class="arch">
+      <!-- LEFT INPUTS -->
+      <div class="arch-col">
+        <div class="arch-box">
+          <strong>真实健康 baseline</strong>
+          <small>4 受试者 &times; 12 任务 (PPG / IMU / EDA)</small>
+        </div>
+        <div class="arch-box">
+          <strong>OpenNeuro 公开数据集</strong>
+          <small>5 个数据集, n=112 真实患者分布</small>
+        </div>
+        <div class="arch-box">
+          <strong>临床专家知识</strong>
+          <small>李医生访谈 + 35 KB 文献规则库</small>
+        </div>
+      </div>
+
+      <!-- ARROW -->
+      <div class="arch-arrow">&rarr;</div>
+
+      <!-- CORE -->
+      <div>
+        <div class="arch-core">
+          <div class="arch-core-title">生成器 v2.1</div>
+          <div class="arch-core-sub">progression × persona × cross-modal coupling</div>
+        </div>
+      </div>
+
+      <!-- ARROW -->
+      <div class="arch-arrow">&rarr;</div>
+
+      <!-- OUTPUTS -->
+      <div class="arch-col">
+        <div class="arch-out">
+          <strong>5 patients × 30 days</strong>
+          <small>540 sensor files</small>
+        </div>
+        <div class="arch-out">
+          <strong>EMA + 量表 + Notes</strong>
+          <small>450 EMA &middot; 25 surveys &middot; 5 clinical notes</small>
+        </div>
+        <div class="arch-out">
+          <strong>BPSD 事件</strong>
+          <small>4 episodes, 90% prevalence</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section-tight">
+  <div class="container">
+    <div class="eyebrow">Key Features</div>
+    <h2 class="section-title">为什么不是又一个噪声生成器</h2>
+    <p class="section-sub">每个模态都被同一进展度变量驱动, 量表落点与真实分布在 KS 检验下不可区分, 行为事件按文献先验注入.</p>
+
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-icon">&#9678;</div>
+        <h3>真实分布对标</h3>
+        <p>MMSE 三组分布 (ctrl 29.69 / mci 22.86 / ad 17.75) 与 MoCA 老年分布 (μ=27.45) 校准合成量表落点.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&harr;</div>
+        <h3>跨模态耦合</h3>
+        <p>同一 progression 同步驱动 sensor 退化系数 / EMA 情绪 / 量表分数 / note 模板.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#9888;</div>
+        <h3>BPSD 事件注入</h3>
+        <p>90% 患病率 wandering / agitation 事件按 progression-conditional 概率插入, 影响当日 EMA 与心率.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x1D4D5;</div>
+        <h3>认知储备机制</h3>
+        <p>edu 16y → reserve 0.65 (强, 掩盖症状); edu 6y → reserve 1.15 (弱, 显症提前) — Stern 2002.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MMSE preview -->
+<section class="section">
+  <div class="container">
+    <div class="eyebrow">Calibration Preview</div>
+    <h2 class="section-title">合成数据 &harr; 真实分布</h2>
+    <p class="section-sub">举例: 三组真实 MMSE 分布 (n=112) 重叠正态曲线. 完整对比与所有数据来源在 Data Sources 页.</p>
+    <div class="plot-frame">
+      <div class="plot-title"><b>MMSE 真实分布对照 — ctrl / mci / ad (n=112)</b><span class="faint mono">ds004504 + ds007427</span></div>
+      <div id="mmseTeaser" style="height: 320px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-tight">
+  <div class="container">
+    <div class="grid-3">
+      <a href="data-sources.html" class="card">
+        <div class="card-icon">&#x21A6;</div>
+        <h3>Data Sources</h3>
+        <p>查看 5 个 OpenNeuro 数据集与真实分布可视化.</p>
+      </a>
+      <a href="method.html" class="card">
+        <div class="card-icon">&#x21A6;</div>
+        <h3>Method</h3>
+        <p>4 层嵌套生成结构, 5 种 progression 模式, 退化系数表.</p>
+      </a>
+      <a href="patients.html" class="card">
+        <div class="card-icon">&#x21A6;</div>
+        <h3>Patient Gallery</h3>
+        <p>5 名虚拟患者的纵向轨迹 — 量表 / EMA / BPSD / note.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script src="js/common.js"></script>
+<script src="js/home.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    insertNav('index');
+    insertFooter();
+    renderHomeMmseTeaser();
+  });
+</script>
+
+</body>
+</html>

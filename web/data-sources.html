@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Sources &middot; AD Synthetic Data Generator</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+<section class="section" style="padding-top: 70px;">
+  <div class="container">
+    <div class="eyebrow">Data Sources</div>
+    <h1 style="font-size: 2.2rem;">真实数据 &middot; 三类来源</h1>
+    <p class="section-sub">
+      生成器不是从噪声起步, 而是从两类真实信号校准: (1) 4 名健康受试者真实可穿戴 baseline; (2) 5 个 OpenNeuro 公开数据集, n=112 真实 AD/MCI/老年患者用于分布对齐.
+    </p>
+  </div>
+</section>
+
+<!-- BASELINE -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <h2 class="section-title">1. 真实健康 baseline</h2>
+    <p class="section-sub">每位受试者完成 12 项任务 (静坐 / 走路 / 双任务 / 站立平衡 / 精细手部 / ...), 同步采集 PPG (心率 + HRV) / IMU (3 轴 acc + gyro) / EDA (皮肤电导).</p>
+    <table class="tbl">
+      <thead>
+        <tr><th>Subject</th><th>Code</th><th>Tasks</th><th>Modalities</th><th>Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>S01</td><td class="mono">zewei</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P01, P02 base</td></tr>
+        <tr><td>S02</td><td class="mono">junkai</td> <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P03 base</td></tr>
+        <tr><td>S03</td><td class="mono">jialu</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P04 base</td></tr>
+        <tr><td>S04</td><td class="mono">zhe</td>    <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P05 base</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- OPENNEURO -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">2. OpenNeuro 公开数据集</h2>
+    <p class="section-sub">用于校准合成患者分布的 5 个开源队列. 涵盖 AD / FTD / MCI / 老年 / PD 共 n=560+ 受试者.</p>
+    <div class="grid-2" id="dsCards"><!-- filled by JS --></div>
+  </div>
+</section>
+
+<!-- DISTRIBUTIONS -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">3. 真实分布可视化</h2>
+    <p class="section-sub">所有合成量表的均值/方差以下列真实分布为参照, KS 检验下不可区分.</p>
+
+    <div class="grid-2" style="grid-template-columns: 1.2fr 1fr;">
+      <div class="plot-frame">
+        <div class="plot-title">
+          <b>MMSE — 三组真实分布 (n=112)</b>
+          <span class="faint mono">ds004504 + ds007427 (FTD &rarr; MCI bucket)</span>
+        </div>
+        <div id="mmsePlot" style="height: 380px;"></div>
+      </div>
+      <div class="plot-frame">
+        <div class="plot-title">
+          <b>MoCA — ds006095 老年队列 (n=71)</b>
+          <span class="faint mono">μ=27.45, σ=1.60</span>
+        </div>
+        <div id="mocaPlot" style="height: 380px;"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 20px; grid-template-columns: 1fr 1fr;">
+      <div class="plot-frame">
+        <div class="plot-title">
+          <b>Age — ds006095 老年队列分布</b>
+          <span class="faint mono">μ=74.66, σ=5.83 (n=71)</span>
+        </div>
+        <div id="agePlot" style="height: 320px;"></div>
+      </div>
+      <div class="plot-frame">
+        <div class="plot-title">
+          <b>BDI 抑郁 — ds004796 中年队列</b>
+          <span class="faint mono">μ=8.52, σ=7.92 (n=192)</span>
+        </div>
+        <div id="bdiPlot" style="height: 320px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="js/common.js"></script>
+<script src="js/data-sources.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    insertNav('data-sources');
+    insertFooter();
+    renderDataSources();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "patient_id": "P02",
+  "base_subject": "S01_zewei",
+  "age": 73,
+  "gender": "M",
+  "education_years": 6,
+  "cognitive_reserve_factor": 1.15,
+  "progression_pattern": "stepwise",
+  "bpsd_prone": true,
+  "bpsd_episodes_total": 1,
+  "n_days": 30,
+  "generated_with": "v2.1 (calibrated by ds004504+ds007427+ds006095, with BPSD/missing/reserve)"
+}

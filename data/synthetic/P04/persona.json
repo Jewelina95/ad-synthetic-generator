@@ -1,0 +1,13 @@
+{
+  "patient_id": "P04",
+  "base_subject": "S03_jialu",
+  "age": 75,
+  "gender": "F",
+  "education_years": 9,
+  "cognitive_reserve_factor": 1.0,
+  "progression_pattern": "fluctuation",
+  "bpsd_prone": true,
+  "bpsd_episodes_total": 1,
+  "n_days": 30,
+  "generated_with": "v2.1 (calibrated by ds004504+ds007427+ds006095, with BPSD/missing/reserve)"
+}

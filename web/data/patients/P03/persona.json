@@ -1,0 +1,13 @@
+{
+  "patient_id": "P03",
+  "base_subject": "S02_junkai",
+  "age": 70,
+  "gender": "M",
+  "education_years": 16,
+  "cognitive_reserve_factor": 0.65,
+  "progression_pattern": "plateau",
+  "bpsd_prone": false,
+  "bpsd_episodes_total": 0,
+  "n_days": 30,
+  "generated_with": "v2.1 (calibrated by ds004504+ds007427+ds006095, with BPSD/missing/reserve)"
+}
