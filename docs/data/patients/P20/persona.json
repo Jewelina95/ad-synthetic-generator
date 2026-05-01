@@ -1,0 +1,15 @@
+{
+  "patient_id": "P20",
+  "base_subject": "S04_zhe",
+  "age": 66,
+  "gender": "M",
+  "education_years": 9,
+  "disease": "ALS",
+  "imu_profile_source": "gait-ndd ALS n=13",
+  "cognitive_reserve_factor": 1.0,
+  "progression_pattern": "acute_event",
+  "bpsd_prone": false,
+  "bpsd_episodes_total": 0,
+  "n_days": 30,
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
+}

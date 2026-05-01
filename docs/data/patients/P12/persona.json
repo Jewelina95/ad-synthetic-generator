@@ -1,0 +1,15 @@
+{
+  "patient_id": "P12",
+  "base_subject": "S02_junkai",
+  "age": 67,
+  "gender": "M",
+  "education_years": 16,
+  "disease": "ctrl_elderly",
+  "imu_profile_source": "interpolation between gait-ndd ctrl + Mind-in-Motion ds006095 71 elderly",
+  "cognitive_reserve_factor": 0.65,
+  "progression_pattern": "linear",
+  "bpsd_prone": false,
+  "bpsd_episodes_total": 0,
+  "n_days": 30,
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
+}

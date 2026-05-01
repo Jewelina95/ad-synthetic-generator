@@ -4,10 +4,12 @@
   "age": 71,
   "gender": "M",
   "education_years": 16,
+  "disease": "PD_mild",
+  "imu_profile_source": "gait-ndd PD n=15",
   "cognitive_reserve_factor": 0.65,
   "progression_pattern": "fluctuation",
   "bpsd_prone": false,
   "bpsd_episodes_total": 0,
   "n_days": 30,
-  "generated_with": "v2.1 (calibrated by ds004504+ds007427+ds006095, with BPSD/missing/reserve)"
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
 }

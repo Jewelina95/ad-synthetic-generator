@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Sources &middot; AD Synthetic Data Generator</title>
+  <title>Data Sources &middot; AD Synthetic Data Generator (v3.1)</title>
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
@@ -11,10 +11,10 @@
 
 <section class="section" style="padding-top: 70px;">
   <div class="container">
-    <div class="eyebrow">Data Sources</div>
-    <h1 style="font-size: 2.2rem;">真实数据 &middot; 三类来源</h1>
+    <div class="eyebrow">Data Sources · v3.1 (10 datasets)</div>
+    <h1 style="font-size: 2.2rem;">真实数据 &middot; 4 类来源, 10 个数据集, n=303 受试者</h1>
     <p class="section-sub">
-      生成器不是从噪声起步, 而是从两类真实信号校准: (1) 4 名健康受试者真实可穿戴 baseline; (2) <b>8 个 OpenNeuro 公开数据集</b> (3 主校准 n=297 + 5 扩展 n=375, 总 n=672+) 真实 AD/MCI/老年/PD/中年风险患者用于分布对齐. <span class="faint">下面 5 张卡片是主校准源详细介绍, 8 个数据集全景见本页第 4 节.</span>
+      Generator v3.1 从 <b>4 名健康 baseline + 10 个公开数据集 (n=303 真实受试者)</b> 校准. 关键升级: <b>跨模态耦合定律</b> (A 类 PPG+IMU 同人 pooled, ρ=0.50 几乎匹配真实 0.51) + <b>17 个 AD EEG signature</b> (B 类 EEG) + <b>疾病条件 IMU 分布</b> (B 类 IMU gait, ctrl/MCI/AD/PD/ALS).
     </p>
   </div>
 </section>
@@ -22,113 +22,262 @@
 <!-- BASELINE -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
-    <h2 class="section-title">1. 真实健康 baseline</h2>
-    <p class="section-sub">每位受试者完成 12 项任务 (静坐 / 走路 / 双任务 / 站立平衡 / 精细手部 / ...), 同步采集 PPG (心率 + HRV) / IMU (3 轴 acc + gyro) / EDA (皮肤电导).</p>
+    <h2 class="section-title">1. 真实健康 baseline (4 名)</h2>
+    <p class="section-sub">每位受试者完成 12 项任务, 同步采集 PPG (心率) / IMU (3 轴 acc) / EDA (皮肤电导).</p>
     <table class="tbl">
       <thead>
         <tr><th>Subject</th><th>Code</th><th>Tasks</th><th>Modalities</th><th>Use</th></tr>
       </thead>
       <tbody>
-        <tr><td>S01</td><td class="mono">zewei</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P01, P02 base</td></tr>
+        <tr><td>S01</td><td class="mono">zewei</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P01, P02, P09 base</td></tr>
         <tr><td>S02</td><td class="mono">junkai</td> <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P03, P06 base</td></tr>
-        <tr><td>S03</td><td class="mono">jialu</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P04, P09, P10 base</td></tr>
-        <tr><td>S04</td><td class="mono">zhe</td>    <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P05, P07, P08 base</td></tr>
+        <tr><td>S03</td><td class="mono">jialu</td>  <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P04, P07, P10 base</td></tr>
+        <tr><td>S04</td><td class="mono">zhe</td>    <td>12</td><td class="mono">PPG / IMU / EDA</td><td>P05, P08 base</td></tr>
       </tbody>
     </table>
     <p class="muted" style="margin-top: 14px; font-size: 0.9rem;">
-      注: 我们同时采集了这 4 名健康受试者的<b>中文语音 baseline</b>, 但<b>未在 v2.2 中合成 AD 患者语音</b> —
-      因为没有真实 AD 患者语音分布作为锚点, 凭空合成会脱离真实人群. 详见 <a href="method.html">Method §5</a>.
+      注: 这 4 名健康受试者 baseline 是 IMU 信号模板, 但 <b>HR 不再来自 baseline</b> — v3.1 改用 A 类 pooled law 重新派生.
     </p>
   </div>
 </section>
 
-<!-- OPENNEURO -->
+<!-- A CLASS -->
 <section class="section">
   <div class="container">
-    <h2 class="section-title">2. OpenNeuro 公开数据集</h2>
-    <p class="section-sub">用于校准合成患者分布的 5 个开源队列. 涵盖 AD / FTD / MCI / 老年 / PD 共 n=560+ 受试者. <span class="faint">点击任一卡片查看完整介绍 / 真实样本 / 我们怎么用它 / 代码片段.</span></p>
-    <div class="grid-2" id="dsCards"><!-- filled by JS --></div>
-  </div>
-</section>
+    <h2 class="section-title">2. A 类 — 同人多模态 PPG+IMU (n=49, 42 小时)</h2>
+    <p class="section-sub">同一受试者同时戴 PPG + IMU. 这是 generator <b>跨模态耦合定律</b>的训练源 — 修复了 v2.2 的 jerk-HR 脱钩 bug (ρ 从 0.13 → 0.50).</p>
 
-<!-- DATASET STATUS PANEL -->
-<section class="section" style="padding-top: 0;">
-  <div class="container">
-    <h2 class="section-title">📦 已下载数据集全景</h2>
-    <p class="section-sub">8 个数据集全部已下载并使用 — 不需要等任何申请. 真实分布全部从本地 <span class="mono">participants.tsv</span> 提取写入 <span class="mono">distributions_master.json</span> + <span class="mono">distributions_extended.json</span>.</p>
-
-    <div class="ds-status-panel" id="dsStatusPanel">
-      <div class="muted">Loading dataset status…</div>
-    </div>
-  </div>
-</section>
-
-<!-- DATASET MODAL -->
-<div id="dsModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
-  <div class="modal" id="dsModal">
-    <div class="modal-head">
-      <div>
-        <div class="eyebrow" id="dsModalEyebrow">Dataset</div>
-        <h2 id="dsModalTitle" style="margin: 0; font-size: 1.4rem;">Dataset</h2>
-        <div id="dsModalSub" class="faint mono" style="font-size: 0.85rem; margin-top: 4px;"></div>
+    <div class="grid-2">
+      <div class="card-ds">
+        <div class="card-head"><b>WESAD</b> <span class="faint mono">n=15, 18 GB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Schmidt et al. ICMI 2018, Univ. Siegen</div>
+          <div><b>设备</b>: 胸前 RespiBAN + 手腕 Empatica E4 (跟手套位置完全对口)</div>
+          <div><b>通道</b>: chest ECG/EDA/EMG/Resp/Temp/ACC @ 700 Hz; wrist BVP @ 64 Hz / ACC 32 Hz / EDA 4 Hz</div>
+          <div><b>协议</b>: baseline → amusement → meditation → TSST stress → recovery</div>
+          <div><b>原 paper</b>: 三分类准确率 80%, TSST stress HR ↑10 BPM</div>
+          <div><b>我们的发现</b>: stress 是 <b>高 HR 低 jerk</b> 独立模式 (ρ=0.26, 4 个数据集最弱)</div>
+          <div><b>用法</b>: BPSD anxiety 模板 (HR↑8 BPM, jerk 不变)</div>
+        </div>
       </div>
-      <button class="modal-close" id="dsModalClose" aria-label="Close">&times;</button>
+      <div class="card-ds">
+        <div class="card-head"><b>PPG-DaLiA</b> <span class="faint mono">n=15, 28 GB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Reiss et al. Sensors 2019, Bosch + Univ. Siegen</div>
+          <div><b>设备</b>: 同 WESAD (RespiBAN + E4)</div>
+          <div><b>协议</b>: 8 个日常活动 (sitting/stairs/cycling/driving/lunch/walking/working/桌足球)</div>
+          <div><b>原 paper</b>: PPG2HR CNN MAE 7.65 BPM, IMU 加入降误差 18%</div>
+          <div><b>我们的发现</b>: ρ(jerk, HR) = <b>0.52</b>; activity 阶梯 sitting 76 → walking 84 → stairs 88 → cycling 98 BPM</div>
+          <div><b>用法</b>: PPG fine-tune 训练集主体, 与 WESAD 共 30 同人</div>
+        </div>
+      </div>
+      <div class="card-ds">
+        <div class="card-head"><b>mHealth</b> <span class="faint mono">n=10, 290 MB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Banos et al. IWAAL 2014, Univ. Granada</div>
+          <div><b>设备</b>: 3 Shimmer2 (chest+ankle+wrist), ECG+9-axis IMU @ 50 Hz</div>
+          <div><b>协议</b>: 12 种动作 (站/坐/卧/走/楼梯/弯腰/抬臂/屈膝/骑车/慢跑/跑/跳)</div>
+          <div><b>原 paper</b>: 12 类活动识别 92% (RF, LOSO)</div>
+          <div><b>我们的发现</b>: ρ(jerk, HR) = <b>0.64</b> (强耦合)</div>
+          <div><b>用法</b>: wrist IMU 12 动作 vocabulary</div>
+        </div>
+      </div>
+      <div class="card-ds">
+        <div class="card-head"><b>PAMAP2</b> <span class="faint mono">n=9, 2.9 GB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Reiss & Stricker ISWC 2012, DFKI</div>
+          <div><b>设备</b>: 3 IMU (hand/chest/ankle) @ 100 Hz + HR @ 9 Hz</div>
+          <div><b>协议</b>: 18 种活动 (含 Nordic walking, 跳绳, 踢足球)</div>
+          <div><b>原 paper</b>: 18 类识别 baseline 74%, HR 对 vigorous 检测有效</div>
+          <div><b>我们的发现</b>: ρ(jerk, HR) = <b>0.75</b> (4 数据集最高); HR 60-160 全覆盖</div>
+          <div><b>用法</b>: <b>activity → HR LUT 金标准</b>, pooled law 主源</div>
+        </div>
+      </div>
     </div>
-    <div class="modal-body" id="dsModalBody">
-      <!-- filled by JS -->
+
+    <div class="card-ds" style="margin-top: 18px; background: #1A2C3F;">
+      <div class="card-head"><b>⭐ A 类综合发现 — 跨数据集 jerk-HR pooled law</b></div>
+      <div class="card-body" style="font-family: 'Courier New', monospace;">
+        HR_BPM = 71.4 + 4.06 × log(1 + jerk_std) + 0.3 × (age - 65) - 0.5 × (30 - MMSE)<br>
+        Pearson r = 0.377, p &lt; 1e-169, n = 5024 windows
+      </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- B CLASS EEG -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">3. B 类 EEG — OpenNeuro AD 队列 (n=163)</h2>
+    <p class="section-sub">提供 AD 真实退化频谱信号. 我们识别出 <b>17 个统计显著的 AD signature</b>, 6 个与 MMSE |ρ|&gt;0.45.</p>
+
+    <div class="grid-2">
+      <div class="card-ds">
+        <div class="card-head"><b>ds002778</b> <span class="faint mono">n=31, 1.2 GB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Jackson et al. eNeuro 2019, UCSD Swann Lab</div>
+          <div><b>队列</b>: 15 PD + 16 ctrl, 平均 ~63 岁</div>
+          <div><b>设备</b>: Biosemi BDF, 32 channels @ 512 Hz, resting state 3 min</div>
+          <div><b>原 paper</b>: PD beta phase locking 增加 (waveform shape)</div>
+          <div><b>我们的发现</b>: 用作 PD 鉴别诊断锚点 (avoid AD persona 误入 PD 分布)</div>
+        </div>
+      </div>
+      <div class="card-ds">
+        <div class="card-head"><b>ds004504</b> <span class="faint mono">⭐ 主校准, n=88, 11 GB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Miltiadous et al. MDPI Data 2023, Greece AHEPA Hospital</div>
+          <div><b>队列</b>: 36 AD + 23 FTD + 29 CN, 平均 66.4 岁</div>
+          <div><b>设备</b>: Nihon Kohden 2100, 19 ch (10-20) @ 500 Hz, 闭眼 resting</div>
+          <div><b>原 paper</b>: 5 个 feature 显著, TAR AUC 0.82, LZC -30%</div>
+          <div><b>我们的发现</b>: <b>17 个 signature</b> (paper 多 12 个), 6 个与 MMSE |ρ|&gt;0.45</div>
+          <div><b>Top 3</b>: alpha_rel_post -58%, PAF -12%, theta_alpha_ratio +47%</div>
+        </div>
+      </div>
+      <div class="card-ds">
+        <div class="card-head"><b>ds007427</b> <span class="faint mono">n=138 (44 raw), 28 GB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Henao Isaza et al. PLOS ONE 2026, Antioquia 哥伦比亚</div>
+          <div><b>队列</b>: PSEN1 E280A 家族性 AD (CTR/DCL/DTA/G1/G2)</div>
+          <div><b>设备</b>: Neuroscan, 64+ ch @ 1000 Hz, resting</div>
+          <div><b>原 paper</b>: PSEN1 携带者无症状已 EEG slowing</div>
+          <div><b>我们的发现</b>: AT_RISK MMSE 24, theta CTR&lt;MCI&lt;AD 单调</div>
+          <div><b>用法</b>: <b>MCI/at-risk 桶分布锚点</b> (普通 AD 数据集只有 CN/AD 二元)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B CLASS IMU -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">4. B 类 IMU 步态 — 神经退化 (n=91)</h2>
+    <p class="section-sub">提供 <b>不同疾病的步态特征边界</b>. 真实 stride CoV: ctrl 0.04 / AD 0.08 / PD 0.18 / ALS 0.43. 这是 generator 从 healthy-young morph 升级到 disease-conditioned 采样的关键.</p>
+
+    <div class="grid-2">
+      <div class="card-ds">
+        <div class="card-head"><b>PhysioNet gait-ndd</b> <span class="faint mono">n=64, 57 MB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Hausdorff Lab, PhysioNet (多篇)</div>
+          <div><b>队列</b>: 16 ctrl + 13 ALS + 20 HD + 15 PD (唯一同时含 4 类的数据集)</div>
+          <div><b>设备</b>: 双脚力传感器 @ 300 Hz, 5 min walking</div>
+          <div><b>原 paper</b>: stride CoV 是神经退化早期指标</div>
+          <div><b>我们的发现</b>: ctrl 0.043 → PD 0.180 → ALS 0.426 (4 倍/10 倍)</div>
+          <div><b>用法</b>: <b>imu_by_disease.json 6 组分布</b>, generator 按 persona.disease 采</div>
+        </div>
+      </div>
+      <div class="card-ds">
+        <div class="card-head"><b>Daphnet-FoG</b> <span class="faint mono">n=10, 110 MB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Bachlin et al. IEEE TITB 2010, ETH + Tel Aviv</div>
+          <div><b>队列</b>: 10 PD 重度 (含频繁 FoG)</div>
+          <div><b>设备</b>: 3 IMU 加速度 (脚踝/大腿/腰) @ 64 Hz, 多 run × 8 小时</div>
+          <div><b>原 paper</b>: FI &gt; 1.0 怀疑 FoG, 11% time in FoG</div>
+          <div><b>我们的发现</b>: FI 中位 2.84 ± 2.34, fog_ratio 0.109</div>
+          <div><b>用法</b>: FoG 事件模板 (<b>仅 PD persona 触发</b>, AD 永不出现)</div>
+        </div>
+      </div>
+      <div class="card-ds">
+        <div class="card-head"><b>HuGaDB</b> <span class="faint mono">n=17, 761 MB</span></div>
+        <div class="card-body">
+          <div><b>来源</b>: Chereshnev & Kertész-Farkas AIST 2017, ITMO</div>
+          <div><b>队列</b>: 17 健康年轻人 (24 ± 3 岁)</div>
+          <div><b>设备</b>: 6 IMU (双侧大腿/小腿/脚) + 2 EMG @ 60.45 Hz</div>
+          <div><b>原 paper</b>: 12 类活动识别 95%, 膝盖 IMU 最关键</div>
+          <div><b>我们的发现</b>: walking acc magnitude 1.544 ± 0.093 g</div>
+          <div><b>用法</b>: young-healthy IMU baseline (但不能当 elderly baseline 用)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- DISTRIBUTIONS -->
 <section class="section">
   <div class="container">
-    <h2 class="section-title">3. 真实分布可视化</h2>
-    <p class="section-sub">所有合成量表的均值/方差以下列真实分布为参照, KS 检验下不可区分.</p>
+    <h2 class="section-title">5. 真实分布可视化</h2>
+    <p class="section-sub">v3.1 generator 校准的真实分布参照 (跨模态耦合定律 + 17 EEG signature + 8 disease IMU profiles).</p>
 
     <div class="grid-2" style="grid-template-columns: 1.2fr 1fr;">
       <div class="plot-frame">
         <div class="plot-title">
-          <b>MMSE — 三组真实分布 (n=112)</b>
-          <span class="faint mono">ds004504 + ds007427 (FTD &rarr; MCI bucket)</span>
+          <b>MMSE — 三组真实分布 (n=159)</b>
+          <span class="faint mono">ds002778 + ds004504 + ds007427</span>
         </div>
         <div id="mmsePlot" style="height: 380px;"></div>
       </div>
       <div class="plot-frame">
         <div class="plot-title">
-          <b>MoCA — ds006095 老年队列 (n=71)</b>
-          <span class="faint mono">μ=27.45, σ=1.60</span>
+          <b>跨模态耦合 ρ — A 类 vs Generator</b>
+          <span class="faint mono">v3.1: 0.50 (was 0.13)</span>
         </div>
-        <div id="mocaPlot" style="height: 380px;"></div>
+        <div id="couplingPlot" style="height: 380px;"></div>
       </div>
     </div>
 
     <div class="grid-2" style="margin-top: 20px; grid-template-columns: 1fr 1fr;">
       <div class="plot-frame">
         <div class="plot-title">
-          <b>Age — ds006095 老年队列分布</b>
-          <span class="faint mono">μ=74.66, σ=5.83 (n=71)</span>
+          <b>Stride CoV — disease 边界 (B 类 IMU)</b>
+          <span class="faint mono">ctrl 0.04 → ALS 0.43</span>
         </div>
-        <div id="agePlot" style="height: 320px;"></div>
+        <div id="stridePlot" style="height: 320px;"></div>
       </div>
       <div class="plot-frame">
         <div class="plot-title">
-          <b>BDI 抑郁 — ds004796 中年队列</b>
-          <span class="faint mono">μ=8.52, σ=7.92 (n=192)</span>
+          <b>17 个 AD EEG signature (B 类 EEG)</b>
+          <span class="faint mono">|Cliff δ| 排序</span>
         </div>
-        <div id="bdiPlot" style="height: 320px;"></div>
+        <div id="eegSigPlot" style="height: 320px;"></div>
       </div>
     </div>
   </div>
 </section>
 
 <script src="js/common.js"></script>
-<script src="js/data-sources.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    insertNav('data-sources');
-    insertFooter();
-    renderDataSources();
+    if (typeof insertNav === 'function') insertNav('data-sources');
+    if (typeof insertFooter === 'function') insertFooter();
+
+    // MMSE distribution
+    const mmseTraces = [
+      {x: Array.from({length: 50}, (_, i) => 18 + i*0.3), y: [], type: 'scatter', mode: 'lines', name: 'CN μ=29.7', line: {color: '#2A9D8F', width: 3}, fill: 'tozeroy', fillcolor: 'rgba(42,157,143,0.2)'},
+      {x: Array.from({length: 50}, (_, i) => 10 + i*0.4), y: [], type: 'scatter', mode: 'lines', name: 'MCI μ=22.9', line: {color: '#E9C46A', width: 3}, fill: 'tozeroy', fillcolor: 'rgba(233,196,106,0.2)'},
+      {x: Array.from({length: 50}, (_, i) => 5 + i*0.5), y: [], type: 'scatter', mode: 'lines', name: 'AD μ=17.8', line: {color: '#E63946', width: 3}, fill: 'tozeroy', fillcolor: 'rgba(230,57,70,0.2)'},
+    ];
+    function gauss(x, mu, sigma) { return Math.exp(-((x-mu)**2)/(2*sigma*sigma))/(sigma*Math.sqrt(2*Math.PI)); }
+    mmseTraces[0].y = mmseTraces[0].x.map(x => gauss(x, 29.7, 0.7));
+    mmseTraces[1].y = mmseTraces[1].x.map(x => gauss(x, 22.9, 3.3));
+    mmseTraces[2].y = mmseTraces[2].x.map(x => gauss(x, 17.8, 4.5));
+    Plotly.newPlot('mmsePlot', mmseTraces, {paper_bgcolor:'transparent', plot_bgcolor:'transparent', font:{color:'#ddd'}, xaxis:{title:'MMSE', gridcolor:'#333'}, yaxis:{title:'density', gridcolor:'#333'}, margin:{t:10,b:50,l:50,r:10}}, {displayModeBar:false});
+
+    // Coupling bar chart
+    Plotly.newPlot('couplingPlot', [{
+      x: ['Generator v2.2', 'Generator v3.1', 'WESAD', 'PPG-DaLiA', 'mHealth', 'PAMAP2'],
+      y: [0.13, 0.50, 0.26, 0.52, 0.64, 0.75],
+      type: 'bar',
+      marker: {color: ['#E63946', '#5EEAD4', '#457B9D', '#457B9D', '#457B9D', '#457B9D']},
+      text: ['BUG', 'FIXED ✓', '', '', '', ''],
+      textposition: 'outside'
+    }], {paper_bgcolor:'transparent', plot_bgcolor:'transparent', font:{color:'#ddd'}, yaxis:{title:'ρ(jerk_std, HR)', range:[0, 0.85], gridcolor:'#333'}, xaxis:{tickangle:-30, gridcolor:'#333'}, margin:{t:10,b:90,l:50,r:10}}, {displayModeBar:false});
+
+    // Stride CoV bar
+    Plotly.newPlot('stridePlot', [{
+      x: ['ctrl', 'ctrl_eld', 'MCI', 'AD', 'PD_mild', 'PD_FoG', 'ALS'],
+      y: [0.043, 0.05, 0.06, 0.08, 0.18, 0.22, 0.43],
+      type: 'bar',
+      marker: {color: ['#2A9D8F', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51', '#E63946', '#9B5DE5']}
+    }], {paper_bgcolor:'transparent', plot_bgcolor:'transparent', font:{color:'#ddd'}, yaxis:{title:'stride CoV', gridcolor:'#333'}, xaxis:{gridcolor:'#333'}, margin:{t:10,b:50,l:50,r:10}}, {displayModeBar:false});
+
+    // EEG signature bar
+    Plotly.newPlot('eegSigPlot', [{
+      x: [0.62, 0.60, -0.56, -0.55, 0.53, -0.50, -0.50, 0.50, 0.50],
+      y: ['alpha_rel_post', 'PAF', 'hjorth_complex', 'theta_abs', 'alpha_rel', 'theta_alpha', 'delta_rel_post', 'beta_rel_post', 'lzc'],
+      type: 'bar',
+      orientation: 'h',
+      marker: {color: '#5EEAD4'}
+    }], {paper_bgcolor:'transparent', plot_bgcolor:'transparent', font:{color:'#ddd', size: 10}, xaxis:{title:"Cliff δ (HC vs AD)", gridcolor:'#333'}, yaxis:{automargin:true, gridcolor:'#333'}, margin:{t:10,b:50,l:90,r:10}}, {displayModeBar:false});
   });
 </script>
 

@@ -1,0 +1,319 @@
+{
+  "WESAD": {
+    "subjects": [
+      "S10",
+      "S11",
+      "S13",
+      "S14",
+      "S15",
+      "S16",
+      "S17",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9"
+    ],
+    "n_subjects": 15,
+    "S2_keys": [
+      "signal",
+      "label",
+      "subject"
+    ],
+    "signal_keys": [
+      "chest",
+      "wrist"
+    ],
+    "chest_channels": {
+      "ACC": [
+        4255300,
+        3
+      ],
+      "ECG": [
+        4255300,
+        1
+      ],
+      "EMG": [
+        4255300,
+        1
+      ],
+      "EDA": [
+        4255300,
+        1
+      ],
+      "Temp": [
+        4255300,
+        1
+      ],
+      "Resp": [
+        4255300,
+        1
+      ]
+    },
+    "wrist_channels": {
+      "ACC": [
+        194528,
+        3
+      ],
+      "BVP": [
+        389056,
+        1
+      ],
+      "EDA": [
+        24316,
+        1
+      ],
+      "TEMP": [
+        24316,
+        1
+      ]
+    },
+    "label_unique": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      7
+    ],
+    "label_shape": [
+      4255300
+    ],
+    "subject_id": "S2"
+  },
+  "PPG-DaLiA": {
+    "subjects": [
+      "S1",
+      "S10",
+      "S11",
+      "S12",
+      "S13",
+      "S14",
+      "S15",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9"
+    ],
+    "n_subjects": 15,
+    "S1_keys": [
+      "rpeaks",
+      "signal",
+      "label",
+      "activity",
+      "questionnaire",
+      "subject"
+    ],
+    "signal_keys": [
+      "chest",
+      "wrist"
+    ],
+    "chest_channels": {
+      "ACC": [
+        6448400,
+        3
+      ],
+      "ECG": [
+        6448400,
+        1
+      ],
+      "EMG": [
+        6448400,
+        1
+      ],
+      "EDA": [
+        6448400,
+        1
+      ],
+      "Temp": [
+        6448400,
+        1
+      ],
+      "Resp": [
+        6448400,
+        1
+      ]
+    },
+    "wrist_channels": {
+      "ACC": [
+        294784,
+        3
+      ],
+      "BVP": [
+        589568,
+        1
+      ],
+      "EDA": [
+        36848,
+        1
+      ],
+      "TEMP": [
+        36848,
+        1
+      ]
+    },
+    "label_shape": [
+      4603
+    ],
+    "activity_unique": [
+      0.0,
+      1.0,
+      2.0,
+      3.0,
+      4.0,
+      5.0,
+      6.0,
+      7.0,
+      8.0
+    ],
+    "activity_csv_cols": [
+      "# SUBJECT_ID",
+      " S1"
+    ],
+    "activity_csv_head": {
+      "# SUBJECT_ID": {
+        "0": "# NO_ACTIVITY",
+        "1": "# BASELINE",
+        "2": "# NO_ACTIVITY"
+      },
+      " S1": {
+        "0": 0,
+        "1": 90,
+        "2": 791
+      }
+    }
+  },
+  "mHealth": {
+    "n_subjects": 10,
+    "n_columns": 24,
+    "fs_hz": 50,
+    "sample_lens_first3": [
+      161280,
+      98304,
+      130561
+    ],
+    "duration_sec_first3": [
+      3225.6,
+      1966.08,
+      2611.22
+    ],
+    "label_col": 23,
+    "label_unique_S1": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      5
+    ],
+    "channel_layout": [
+      "0-2:chest_acc_xyz",
+      "3-4:ecg_l1_l2",
+      "5-7:ankle_acc_xyz",
+      "8-10:ankle_gyro_xyz",
+      "11-13:ankle_mag_xyz",
+      "14-16:wrist_acc_xyz",
+      "17-19:wrist_gyro_xyz",
+      "20-22:wrist_mag_xyz",
+      "23:label"
+    ],
+    "activities": [
+      "L1:standing",
+      "L2:sitting",
+      "L3:lying",
+      "L4:walking",
+      "L5:stairs",
+      "L6:waist_bends",
+      "L7:arm_elev",
+      "L8:knee_bends",
+      "L9:cycling",
+      "L10:jogging",
+      "L11:running",
+      "L12:jump"
+    ]
+  },
+  "PAMAP2": {
+    "n_subjects_protocol": 9,
+    "n_subjects_optional": 5,
+    "n_columns": 54,
+    "fs_imu_hz": 100,
+    "fs_hr_hz": 9,
+    "duration_sec_S1_protocol": 3764.17,
+    "duration_min_S1_protocol": 62.73616666666667,
+    "channel_layout": [
+      "0:timestamp_sec",
+      "1:activity_id",
+      "2:HR_bpm",
+      "3:hand_temp",
+      "4-6:hand_acc16g_xyz",
+      "7-9:hand_acc6g_xyz",
+      "10-12:hand_gyro_xyz",
+      "13-15:hand_mag_xyz",
+      "16-19:hand_orientation",
+      "20:chest_temp",
+      "21-23:chest_acc16g",
+      "24-26:chest_acc6g",
+      "27-29:chest_gyro",
+      "30-32:chest_mag",
+      "33-36:chest_orientation",
+      "37:ankle_temp",
+      "38-40:ankle_acc16g",
+      "41-43:ankle_acc6g",
+      "44-46:ankle_gyro",
+      "47-49:ankle_mag",
+      "50-53:ankle_orientation"
+    ],
+    "label_col": 1,
+    "label_unique_S1": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      12,
+      13,
+      16,
+      17,
+      24
+    ],
+    "activities_lookup": {
+      "1": "lying",
+      "2": "sitting",
+      "3": "standing",
+      "4": "walking",
+      "5": "running",
+      "6": "cycling",
+      "7": "Nordic walking",
+      "9": "TV",
+      "10": "computer",
+      "11": "car",
+      "12": "ascending stairs",
+      "13": "descending stairs",
+      "16": "vacuum",
+      "17": "ironing",
+      "18": "folding laundry",
+      "19": "house cleaning",
+      "20": "soccer",
+      "24": "rope jumping",
+      "0": "transient/no activity"
+    }
+  }
+}

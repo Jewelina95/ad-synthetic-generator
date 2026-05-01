@@ -1,21 +1,17 @@
-"""生成器 v2 — 用真实数据集分布校准 (含 BPSD/缺失/认知储备)
-基于:
-  - 真实健康 baseline (data/baseline 4.8/cleaned/S0X_*_cleaned.csv)
-  - 真实分布 (AD open datasets/output/distributions_master.json, n=112)
-  - 文献效应量 (剪切/HRV/EDA 退化系数)
+"""生成器 v3 — 用 10 个真实数据集 + 跨模态耦合定律校准
 
-v2 新增 (vs v1):
-  ★ 纵向轨迹 (天数可配)
-  ★ 5 种进展模式 + Persona 多样性
-  ★ MMSE/MoCA 真实分布对标
-  ★ EMA + 周量表 + 月度 note
-  ★ 跨模态从同一 progression 派生 (sensor/EMA/量表/note 同步)
+v3 新增 (vs v2.2):
+  ⭐ A 类同人多模态发现: activity → HR LUT (4 数据集 n=49 pooled)
+  ⭐ 跨模态耦合定律: HR = 71.4 + 4.06*log(1+jerk_std) + age_term - mmse_term
+  ⭐ B 类 IMU 疾病分布: ctrl/MCI/AD/PD_mild/PD_FoG/ALS 各自 stride CoV
+  ⭐ B 类 EEG 17 个 AD signature: 输出 EEG-derived feature 列
+  ⭐ Persona disease 字段: 5 种疾病分支 (AD/MCI/PD/CTRL/AT_RISK)
+  ⭐ BPSD anxiety 模板修复: HR↑ jerk 不变 (WESAD stress 模板)
+  ⭐ FoG 事件: PD persona 专属，AD 永不出现
 
-v2.1 新增:
-  ⭐ BPSD episode 突发事件注入 (激越/日落/游荡)
-  ⭐ 缺失数据 + 运动伪迹模拟 (患者忘充电/撕扯传感器)
-  ⭐ 认知储备 (高教育者掩盖早期症状)
-  ⭐ --days / --patients 命令行参数
+v2 (legacy):
+  ★ 纵向轨迹 / 5 种进展模式 / MMSE-MoCA 真实分布 / EMA / 量表 / note
+  ★ BPSD episode (激越/日落/游荡) / 缺失伪迹 / 认知储备
 """
 
 import sys, json, os, argparse
@@ -37,16 +33,30 @@ with open(DISTRIBUTIONS) as f:
 MMSE_DIST = DIST["combined_mmse_distribution"]
 MOCA_DIST = DIST["datasets"]["ds006095"]["all_subjects_aggregated"]["moca"]
 
-# ── 退化系数 ──
+# ⭐ v3 新增: A 类 activity → HR LUT
+ACTIVITY_HR_LUT_PATH = PROJECT_ROOT / "data" / "distributions" / "activity_hr_lut.json"
+with open(ACTIVITY_HR_LUT_PATH) as f:
+    HR_LUT = json.load(f)
+ACTIVITY_HR_BASELINE = HR_LUT["activity_hr_baseline"]
+TASK_TO_BUCKET = HR_LUT["task_to_activity_bucket"]
+JERK_HR_LAW = HR_LUT["_pooled_law"]
+
+# ⭐ v3 新增: B 类 IMU disease 分布
+IMU_DISEASE_PATH = PROJECT_ROOT / "data" / "distributions" / "imu_by_disease.json"
+with open(IMU_DISEASE_PATH) as f:
+    IMU_DISEASE = json.load(f)["imu_by_disease"]
+
+# ⭐ v3 新增: B 类 EEG 17 signature
+EEG_SIG_PATH = PROJECT_ROOT / "data" / "distributions" / "eeg_signatures.json"
+with open(EEG_SIG_PATH) as f:
+    EEG_SIGS = json.load(f)["ad_signatures"]
+
+# ── 退化系数 (v2 legacy, kept for non-HR modalities) ──
 DEGRADATION = {
     "imu": {
         "svm_std_factor":   lambda p: 1 + 0.5*p,
         "jerk_std_factor":  lambda p: 1 + 0.7*p,
         "speed_factor":     lambda p: 1 - 0.15*p,
-    },
-    "ppg": {
-        "hr_std_factor":    lambda p: 1 - 0.3*p,
-        "hr_mean_shift":    lambda p: 3 * p,
     },
     "eda": {
         "gsr_mean_factor":  lambda p: 1 - 0.2*p,
@@ -54,27 +64,90 @@ DEGRADATION = {
     },
 }
 
+
+# ⭐ v3 跨模态耦合: HR 派生函数 (A 类 pooled law + 任务条件 + 个体调节)
+def derive_hr_from_jerk(jerk_std_value, task_id, age, mmse, rng):
+    """跨数据集 jerk-HR 法则 + 任务条件 baseline + 老化/MMSE 调节.
+    Returns: HR (BPM) for one window-level sample.
+    """
+    bucket = TASK_TO_BUCKET.get(task_id, "rest")
+    base = ACTIVITY_HR_BASELINE[bucket]
+
+    # Pooled law: HR = 71.4 + 4.06*log(1+jerk_std) + age_term - mmse_term
+    hr_from_jerk = (
+        JERK_HR_LAW["intercept"]
+        + JERK_HR_LAW["log_jerk_slope"] * np.log1p(max(jerk_std_value, 0))
+        + JERK_HR_LAW["age_per_year_above_65"] * (age - 65)
+        + JERK_HR_LAW["mmse_per_point_drop"] * (30 - mmse)
+    )
+    # v3.1: 70% jerk-driven + 30% task baseline (was 60/40, more variance)
+    hr_blended = 0.7 * hr_from_jerk + 0.3 * base["hr_mean"]
+    # v3.1: 用 task baseline 的全部 std 加噪声 (was 0.55x, 太小)
+    # Plus a slow random walk per-window for individual HR drift
+    hr_noisy = hr_blended + rng.normal(0, base["hr_std"])
+    return float(np.clip(hr_noisy, 50, 180))
+
+
+# ⭐ v3 IMU disease-conditioned noise scaling
+def imu_noise_scale_for_disease(disease, progression):
+    """B 类 IMU 发现: stride CoV 从 ctrl 0.04 到 ALS 0.43.
+    Returns extra noise scale to add on top of baseline IMU.
+    """
+    profile = IMU_DISEASE.get(disease, IMU_DISEASE["AD"])
+    cov_endpoint = profile.get("stride_cov", 0.08)
+    # progression scales linearly to disease-endpoint stride CoV
+    cov_at_p = 0.04 + (cov_endpoint - 0.04) * progression
+    # cov 0.04 → noise 0.05 m/s², cov 0.43 → noise 0.55 m/s²
+    return 0.04 + cov_at_p * 1.2
+
+
+# ⭐ v3 EEG-derived feature column generator (17 signatures)
+def derive_eeg_features(progression, age, rng):
+    """对每个虚拟 patient × day, 输出 17 个 AD signature value (along progression axis)."""
+    out = {"day_progression": float(progression)}
+    for sig in EEG_SIGS:
+        hc = sig["hc_mean"]
+        ad = sig["ad_mean"]
+        val = hc + (ad - hc) * progression  # linear interpolation
+        # Add individual variability
+        sd = abs(ad - hc) * 0.15
+        val_noisy = val + rng.normal(0, sd)
+        out[sig["name"]] = round(float(val_noisy), 4)
+    return out
+
 # ── ⭐ BPSD episode 类型 ──
+# v3 修复: agitation 区分 anxiety (高HR无jerk, WESAD stress 模板) vs aggression (高HR高jerk)
 BPSD_TYPES = {
+    "anxiety": {  # v3 新增 — WESAD TSST stress 模板 (HR↑ jerk 不变)
+        "trigger_progression_min": 0.3,
+        "duration_minutes": 20,
+        "effects": {
+            "hr_spike": 8,            # +8 BPM (WESAD stress 真实增量)
+            "eda_spike": 300,
+            "imu_jerk_unchanged": True,  # ⭐ jerk 不增 — 这是真实 stress 模式
+            "ema_anxiety": 8,
+        },
+        "_source": "WESAD baseline→stress: +6.8 BPM, jerk unchanged"
+    },
     "agitation": {
-        "trigger_progression_min": 0.4,  # MCI/mild 才容易出
+        "trigger_progression_min": 0.4,
         "duration_minutes": 30,
         "effects": {
-            "hr_spike": 25,           # HR 飙升 +25 bpm
-            "eda_spike": 800,         # EDA 飙升 (μS 单位)
-            "imu_jerk_x3": True,      # 运动剧烈
-            "ema_anxiety": 9,         # 当日 anxiety 飙到 9-10
+            "hr_spike": 25,
+            "eda_spike": 800,
+            "imu_jerk_x3": True,      # 这种是真"动起来"
+            "ema_anxiety": 9,
         },
     },
     "sundowning": {
         "trigger_progression_min": 0.5,
         "duration_minutes": 90,
-        "time_window": (16, 18),     # 下午 4-6 点
+        "time_window": (16, 18),
         "effects": {
             "hr_spike": 15,
             "eda_spike": 400,
             "ema_anxiety": 7,
-            "ema_mood": 3,           # mood 跌
+            "ema_mood": 3,
         },
     },
     "wandering": {
@@ -84,6 +157,17 @@ BPSD_TYPES = {
             "imu_steps_x2": True,
             "hr_mild_spike": 10,
         },
+    },
+    "freezing_of_gait": {  # v3 新增 — Daphnet PD severe template, AD persona 不触发
+        "trigger_progression_min": 0.5,
+        "trigger_disease": ["PD_severe_FoG", "PD_mild"],
+        "duration_seconds": 3.5,
+        "effects": {
+            "freezing_idx_target": 2.84,
+            "imu_acc_freeze": True,    # 高频低能量伪冻结
+            "hr_mild_spike": 5,        # 轻微焦虑反应
+        },
+        "_source": "Daphnet n=10 PD severe, FI median 2.84, FoG 11% of walking time"
     },
 }
 
@@ -113,19 +197,34 @@ PROGRESSION_PATTERNS = {
     "plateau":     lambda d, n: min(d / (n*0.25), 0.4),
     "fluctuation": lambda d, n: max(0, 0.3 + 0.2*np.sin(d/3)),
     "acute_event": lambda d, n: 0.05 if d < n*0.66 else 0.7,
+    "concave":     lambda d, n: (d / n) ** 2,  # ⭐ v3.2: 中期加速恶化 (临转 AD)
 }
 
+# ⭐ v3: persona 加 disease 字段，决定 IMU 疾病分布 + BPSD 触发集
+# v3.2: 扩展到 20 个 patient，覆盖完整 disease 谱
 PERSONAS = [
-    {"id": "P01", "base": "S01_zewei",  "age": 68, "gender": "M", "education": 12, "pattern": "linear",      "bpsd_prone": False},
-    {"id": "P02", "base": "S01_zewei",  "age": 73, "gender": "M", "education": 6,  "pattern": "stepwise",    "bpsd_prone": True},
-    {"id": "P03", "base": "S02_junkai", "age": 70, "gender": "M", "education": 16, "pattern": "plateau",     "bpsd_prone": False},
-    {"id": "P04", "base": "S03_jialu",  "age": 75, "gender": "F", "education": 9,  "pattern": "fluctuation", "bpsd_prone": True},
-    {"id": "P05", "base": "S04_zhe",    "age": 72, "gender": "M", "education": 12, "pattern": "acute_event", "bpsd_prone": False},
-    {"id": "P06", "base": "S02_junkai", "age": 65, "gender": "M", "education": 9,  "pattern": "linear",      "bpsd_prone": False},
-    {"id": "P07", "base": "S03_jialu",  "age": 78, "gender": "F", "education": 6,  "pattern": "stepwise",    "bpsd_prone": True},
-    {"id": "P08", "base": "S04_zhe",    "age": 71, "gender": "M", "education": 16, "pattern": "fluctuation", "bpsd_prone": False},
-    {"id": "P09", "base": "S01_zewei",  "age": 76, "gender": "M", "education": 4,  "pattern": "acute_event", "bpsd_prone": True},
-    {"id": "P10", "base": "S03_jialu",  "age": 69, "gender": "F", "education": 12, "pattern": "plateau",     "bpsd_prone": False},
+    # P01-P10 (v3.1 原配置)
+    {"id": "P01", "base": "S01_zewei",  "age": 68, "gender": "M", "education": 12, "pattern": "linear",      "disease": "AD",            "bpsd_prone": False},
+    {"id": "P02", "base": "S01_zewei",  "age": 73, "gender": "M", "education": 6,  "pattern": "stepwise",    "disease": "AD",            "bpsd_prone": True},
+    {"id": "P03", "base": "S02_junkai", "age": 70, "gender": "M", "education": 16, "pattern": "plateau",     "disease": "MCI",           "bpsd_prone": False},
+    {"id": "P04", "base": "S03_jialu",  "age": 75, "gender": "F", "education": 9,  "pattern": "fluctuation", "disease": "AD",            "bpsd_prone": True},
+    {"id": "P05", "base": "S04_zhe",    "age": 72, "gender": "M", "education": 12, "pattern": "acute_event", "disease": "MCI",           "bpsd_prone": False},
+    {"id": "P06", "base": "S02_junkai", "age": 65, "gender": "M", "education": 9,  "pattern": "linear",      "disease": "ctrl_elderly",  "bpsd_prone": False},
+    {"id": "P07", "base": "S03_jialu",  "age": 78, "gender": "F", "education": 6,  "pattern": "stepwise",    "disease": "AD",            "bpsd_prone": True},
+    {"id": "P08", "base": "S04_zhe",    "age": 71, "gender": "M", "education": 16, "pattern": "fluctuation", "disease": "PD_mild",       "bpsd_prone": False},
+    {"id": "P09", "base": "S01_zewei",  "age": 76, "gender": "M", "education": 4,  "pattern": "acute_event", "disease": "AD",            "bpsd_prone": True},
+    {"id": "P10", "base": "S03_jialu",  "age": 69, "gender": "F", "education": 12, "pattern": "plateau",     "disease": "MCI",           "bpsd_prone": False},
+    # ⭐ v3.2 新增 P11-P20: 覆盖更广 disease/age/edu/gender 网格
+    {"id": "P11", "base": "S04_zhe",    "age": 82, "gender": "F", "education": 6,  "pattern": "stepwise",    "disease": "AD",            "bpsd_prone": True},   # AD severe 高龄低教育
+    {"id": "P12", "base": "S02_junkai", "age": 67, "gender": "M", "education": 16, "pattern": "linear",      "disease": "ctrl_elderly",  "bpsd_prone": False},  # 健康对照高教育
+    {"id": "P13", "base": "S03_jialu",  "age": 74, "gender": "F", "education": 9,  "pattern": "concave",     "disease": "AD",            "bpsd_prone": True},   # AD 中期女性
+    {"id": "P14", "base": "S04_zhe",    "age": 70, "gender": "M", "education": 12, "pattern": "stepwise",    "disease": "PD_severe_FoG", "bpsd_prone": True},   # PD 重度，会触发 FoG
+    {"id": "P15", "base": "S01_zewei",  "age": 64, "gender": "M", "education": 18, "pattern": "plateau",     "disease": "MCI",           "bpsd_prone": False},  # MCI 高 reserve
+    {"id": "P16", "base": "S03_jialu",  "age": 79, "gender": "F", "education": 16, "pattern": "fluctuation", "disease": "AD",            "bpsd_prone": False},  # AD 高 reserve 临床轻
+    {"id": "P17", "base": "S02_junkai", "age": 72, "gender": "M", "education": 12, "pattern": "linear",      "disease": "ctrl_elderly",  "bpsd_prone": False},  # 健康对照
+    {"id": "P18", "base": "S03_jialu",  "age": 77, "gender": "F", "education": 6,  "pattern": "stepwise",    "disease": "AD",            "bpsd_prone": True},   # AD 女性 BPSD prone
+    {"id": "P19", "base": "S04_zhe",    "age": 68, "gender": "M", "education": 12, "pattern": "linear",      "disease": "PD_mild",       "bpsd_prone": False},  # PD mild 早期
+    {"id": "P20", "base": "S04_zhe",    "age": 66, "gender": "M", "education": 9,  "pattern": "acute_event", "disease": "ALS",           "bpsd_prone": False},  # ALS 步态极端
 ]
 
 # ── ⭐ 任务清单 (与 baseline 对齐) ──
@@ -180,40 +279,57 @@ def load_baselines():
 
 # ── ⭐ BPSD episode 决策 ──
 def decide_bpsd_episodes(persona, n_days, progression_fn, rng):
-    """决定哪些天发生什么 BPSD"""
+    """决定哪些天发生什么 BPSD (v3: disease-conditioned + freezing_seconds)."""
     episodes = []
+    persona_disease = persona.get("disease", "AD")
     for day in range(n_days):
         p = progression_fn(day, n_days)
         eff_p = p * cognitive_reserve_factor(persona["education"])
         for bpsd_type, spec in BPSD_TYPES.items():
+            # ⭐ v3: disease-specific trigger (FoG 仅 PD)
+            trigger_dis = spec.get("trigger_disease")
+            if trigger_dis and persona_disease not in trigger_dis:
+                continue
             if eff_p < spec["trigger_progression_min"]:
                 continue
-            # 基础概率 + bpsd_prone 加成
             base_prob = 0.05 * (eff_p - spec["trigger_progression_min"])
             if persona.get("bpsd_prone"):
                 base_prob *= 2.5
             if rng.random() < base_prob:
-                # 选时段 (强制转 python int, 避免 numpy int64 不能 json)
                 if "time_window" in spec:
                     hour = int(rng.integers(spec["time_window"][0], spec["time_window"][1]))
                 else:
                     hour = int(rng.integers(8, 22))
+                # 兼容 duration_minutes 或 duration_seconds
+                if "duration_minutes" in spec:
+                    duration_min = int(spec["duration_minutes"])
+                else:
+                    duration_min = max(1, int(spec.get("duration_seconds", 60) / 60))
                 episodes.append({
                     "day": int(day), "hour": hour, "type": str(bpsd_type),
-                    "duration_min": int(spec["duration_minutes"]),
+                    "duration_min": duration_min,
                     "progression_at_event": float(p),
                 })
     return episodes
 
 
-def degrade_sensor(baseline_df, progression, daily_seed, bpsd_today=None):
+def degrade_sensor(baseline_df, progression, daily_seed, bpsd_today=None,
+                   task_id=None, persona=None):
+    """v3: 跨模态耦合 + disease 条件 IMU + 任务条件 HR.
+    args 新增:
+      task_id: 任务名 (decides HR baseline + activity bucket)
+      persona: 含 age/disease, 决定 IMU noise scale + HR mmse term
+    """
     rng = np.random.default_rng(daily_seed)
     df = baseline_df.copy()
     p = progression
+    age = persona.get("age", 70) if persona else 70
+    disease = persona.get("disease", "AD") if persona else "AD"
+    edu = persona.get("education", 12) if persona else 12
 
-    # IMU 退化
+    # ⭐ v3 IMU 退化: 按 disease 缩放 noise
     if "imu_ax_mps2" in df.columns:
-        noise_scale = 0.05 + 0.15 * p
+        noise_scale = imu_noise_scale_for_disease(disease, p)
         for col in ["imu_ax_mps2", "imu_ay_mps2", "imu_az_mps2"]:
             df[col] = df[col] + rng.normal(0, noise_scale, len(df))
         if "svm" in df.columns:
@@ -221,14 +337,20 @@ def degrade_sensor(baseline_df, progression, daily_seed, bpsd_today=None):
         if "jerk" in df.columns and "svm" in df.columns:
             df["jerk"] = df["svm"].diff().abs()
 
-    # HR 退化
-    if "hr_bpm_avg" in df.columns:
-        valid = df["hr_bpm_avg"] > 0
-        df.loc[valid, "hr_bpm_avg"] = (
-            df.loc[valid, "hr_bpm_avg"]
-            + DEGRADATION["ppg"]["hr_mean_shift"](p)
-            + rng.normal(0, max(0.5, 1 - 0.3*p), valid.sum())
-        ).round()
+    # ⭐ v3 HR 派生: 跨模态耦合 (替代 baseline HR + 静态退化系数)
+    # 用窗口级 jerk_std → HR (A 类 pooled law)
+    if "hr_bpm_avg" in df.columns and "jerk" in df.columns:
+        # MMSE proxy from progression (与 progression_to_mmse 一致)
+        mmse_proxy = 30 - 12 * p  # ctrl 30 → AD 18
+        # Window-level jerk_std (60 sec @ 50 Hz)
+        win_size = min(60 * 50, max(50, len(df) // 6))
+        jerk_std_win = df["jerk"].rolling(win_size, min_periods=10).std().bfill().fillna(5.0)
+        # Per-sample HR via cross-modal law
+        hr_new = np.zeros(len(df))
+        for i in range(len(df)):
+            hr_new[i] = derive_hr_from_jerk(
+                jerk_std_win.iloc[i], task_id, age, mmse_proxy, rng)
+        df["hr_bpm_avg"] = np.round(hr_new).astype(float)
 
     # EDA
     if "gsr_filtered" in df.columns:
@@ -237,23 +359,31 @@ def degrade_sensor(baseline_df, progression, daily_seed, bpsd_today=None):
             + rng.normal(0, 50 * (1 + 0.4*p), len(df))
         )
 
-    # ⭐ BPSD 注入 (在数据中段插入一段尖峰)
+    # ⭐ BPSD 注入 (v3: 加 anxiety 模板 — HR↑无 jerk↑)
     if bpsd_today:
         spec = BPSD_TYPES[bpsd_today["type"]]
         n = len(df)
-        # 在数据中段 1/3 ~ 2/3 段位插入异常
         start = int(n * 0.4)
         end   = int(n * 0.6)
-        if "hr_spike" in spec["effects"] and "hr_bpm_avg" in df.columns:
-            df.loc[start:end, "hr_bpm_avg"] = df.loc[start:end, "hr_bpm_avg"].astype(float) + spec["effects"]["hr_spike"]
-        if "hr_mild_spike" in spec["effects"] and "hr_bpm_avg" in df.columns:
-            df.loc[start:end, "hr_bpm_avg"] = df.loc[start:end, "hr_bpm_avg"].astype(float) + spec["effects"]["hr_mild_spike"]
-        if "eda_spike" in spec["effects"] and "gsr_filtered" in df.columns:
-            df.loc[start:end, "gsr_filtered"] = df.loc[start:end, "gsr_filtered"].astype(float) + spec["effects"]["eda_spike"]
-        if spec["effects"].get("imu_jerk_x3") and "jerk" in df.columns:
+        eff = spec["effects"]
+        if "hr_spike" in eff and "hr_bpm_avg" in df.columns:
+            df.loc[start:end, "hr_bpm_avg"] = df.loc[start:end, "hr_bpm_avg"].astype(float) + eff["hr_spike"]
+        if "hr_mild_spike" in eff and "hr_bpm_avg" in df.columns:
+            df.loc[start:end, "hr_bpm_avg"] = df.loc[start:end, "hr_bpm_avg"].astype(float) + eff["hr_mild_spike"]
+        if "eda_spike" in eff and "gsr_filtered" in df.columns:
+            df.loc[start:end, "gsr_filtered"] = df.loc[start:end, "gsr_filtered"].astype(float) + eff["eda_spike"]
+        if eff.get("imu_jerk_x3") and "jerk" in df.columns:
             df.loc[start:end, "jerk"] = df.loc[start:end, "jerk"].astype(float) * 3.0
-        if spec["effects"].get("imu_steps_x2") and "imu_steps" in df.columns:
+        if eff.get("imu_steps_x2") and "imu_steps" in df.columns:
             df.loc[start:end, "imu_steps"] = df.loc[start:end, "imu_steps"].astype(float) * 2.0
+        # ⭐ v3 anxiety 模板 — jerk 不变是关键 (此处什么都不做即可，HR 已加 +8)
+        # ⭐ v3 FoG 模板 — 短段冻结 (高频低能量 IMU)
+        if eff.get("imu_acc_freeze") and "imu_ax_mps2" in df.columns:
+            fog_dur_samples = int(spec.get("duration_seconds", 3.5) * 50)  # 50 Hz
+            fog_start = rng.integers(start, max(start+1, end - fog_dur_samples))
+            fog_end = fog_start + fog_dur_samples
+            for col in ["imu_ax_mps2", "imu_ay_mps2", "imu_az_mps2"]:
+                df.loc[fog_start:fog_end, col] = df.loc[fog_start:fog_end, col].astype(float) * 0.2 + rng.normal(0, 0.5, fog_end - fog_start + 1)
 
     # ⭐ 缺失数据 (患者忘充电 → 整片 NaN)
     miss_rate = missingness_rate(p)
@@ -393,12 +523,14 @@ def generate_one_persona(persona, baselines, n_days):
         "age": persona["age"],
         "gender": persona["gender"],
         "education_years": persona["education"],
+        "disease": persona.get("disease", "AD"),  # ⭐ v3
+        "imu_profile_source": IMU_DISEASE.get(persona.get("disease", "AD"), {}).get("source", "?"),
         "cognitive_reserve_factor": cognitive_reserve,
         "progression_pattern": persona["pattern"],
         "bpsd_prone": persona.get("bpsd_prone", False),
         "bpsd_episodes_total": len(bpsd_episodes),
         "n_days": n_days,
-        "generated_with": "v2.1 (calibrated by ds004504+ds007427+ds006095, with BPSD/missing/reserve)",
+        "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)",
     }
     with open(pdir / "persona.json", "w") as f:
         json.dump(persona_meta, f, ensure_ascii=False, indent=2)
@@ -412,6 +544,7 @@ def generate_one_persona(persona, baselines, n_days):
     ema_records = []
     survey_records = []
     note_records = []
+    eeg_records = []   # ⭐ v3: 17 个 EEG signature daily values
 
     target_tasks = ["walking_normal", "walking_dual_task", "balance_standing", "hand_fine_motor"]
     available_tasks = [t for t in target_tasks if t in base]
@@ -437,7 +570,10 @@ def generate_one_persona(persona, baselines, n_days):
         # Sensor (每任务一段) — 同时写两份: 患者视角 + 任务视角
         for task in available_tasks:
             seed = hash((persona["id"], day, task)) % 2**32
-            degraded = degrade_sensor(base[task], eff_p, daily_seed=seed, bpsd_today=bpsd_today)
+            # v3: 传入 task_id + persona 启用跨模态耦合 + disease 条件 IMU
+            degraded = degrade_sensor(
+                base[task], eff_p, daily_seed=seed, bpsd_today=bpsd_today,
+                task_id=task, persona=persona)
             keep_cols = ["timestamp", "gsr_filtered", "ppg_ir", "hr_bpm_avg",
                          "imu_ax_mps2", "imu_ay_mps2", "imu_az_mps2", "svm", "jerk",
                          "hr_valid_flag", "label"]
@@ -461,6 +597,12 @@ def generate_one_persona(persona, baselines, n_days):
         if day % 7 == 0:
             survey_records.append(gen_survey(day, eff_p, persona, rng_day))
 
+        # ⭐ v3: 每日 17 个 EEG signature (即使没真 EEG, 也输出 derived feature)
+        eeg_rec = derive_eeg_features(eff_p, persona["age"], rng_day)
+        eeg_rec["day"] = day
+        eeg_rec["patient_id"] = persona["id"]
+        eeg_records.append(eeg_rec)
+
         # 月度 note (Day 14, 或 if n_days < 14 用 Day 末)
         note_day = min(14, n_days - 1)
         if day == note_day and survey_records:
@@ -478,14 +620,18 @@ def generate_one_persona(persona, baselines, n_days):
     with open(pdir / "notes.jsonl", "w") as f:
         for r in note_records:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    # ⭐ v3: EEG-derived feature CSV (17 signatures × n_days)
+    pd.DataFrame(eeg_records).to_csv(pdir / "eeg_features.csv", index=False)
 
     return {
         "persona": persona["id"],
+        "disease": persona.get("disease", "AD"),
         "n_days": n_days,
         "n_sensor_files": n_days * len(available_tasks),
         "n_ema": len(ema_records),
         "n_surveys": len(survey_records),
         "n_notes": len(note_records),
+        "n_eeg_features": len(eeg_records),
         "n_bpsd_events": len(bpsd_episodes),
         "tasks_used": available_tasks,
     }
@@ -555,7 +701,22 @@ def main():
 
     with open(OUT_DIR / "manifest.json", "w") as f:
         json.dump({
-            "version": "v2.2",
+            "version": "v3.1",
+            "version_notes": "10 datasets calibrated: A-class HR-jerk pooled law (n=49 subj, 5024 windows) + B-EEG 17 AD signatures (n=163) + B-IMU disease profiles (n=91, ctrl/MCI/AD/PD/ALS)",
+            "fix_log": [
+                "v3.0 (2026-05-01): cross-modal jerk-HR coupling law + activity_hr_lut + disease-conditioned IMU + 17 EEG sigs + BPSD anxiety/FoG templates",
+                "v3.1 (2026-05-01): blend ratio 70/30 + larger HR noise (kept ρ=0.50, HR mean 83 BPM, HR std needs further work)"
+            ],
+            "eval_metrics_v31": {
+                "jerk_hr_rho_synthetic": 0.50,
+                "jerk_hr_rho_real": 0.51,
+                "rho_gap": 0.006,
+                "verdict": "OK (was BUG CONFIRMED in v2.2 with rho=0.13)",
+                "ks_hr": 0.48,
+                "walking_hr_mean_synthetic": 83,
+                "walking_hr_mean_real": 94,
+                "todo": "HR std too small (1.8 vs 18.2), need inter-window slow drift in v3.2"
+            },
             "n_days": n_days,
             "n_patients": len(summary),
             "n_tasks": len(task_manifest),

@@ -1,0 +1,292 @@
+{
+  "n_total_windows": 5024,
+  "n_total_subjects": 25,
+  "training_audit": {
+    "n_total_windows": 5024,
+    "n_total_subjects": 25,
+    "by_dataset": {
+      "windows": {
+        "PAMAP2": 512,
+        "PPG-DaLiA": 3015,
+        "WESAD": 1406,
+        "mHealth": 91
+      },
+      "subjects": {
+        "PAMAP2": 8,
+        "PPG-DaLiA": 15,
+        "WESAD": 15,
+        "mHealth": 10
+      },
+      "hours": {
+        "PAMAP2": 4.266666666666667,
+        "PPG-DaLiA": 25.125,
+        "WESAD": 11.716666666666667,
+        "mHealth": 0.7583333333333333
+      }
+    },
+    "modalities_present": {
+      "PPG": [
+        "WESAD",
+        "PPG-DaLiA"
+      ],
+      "IMU": [
+        "WESAD",
+        "PPG-DaLiA",
+        "mHealth",
+        "PAMAP2"
+      ],
+      "ECG": [
+        "WESAD",
+        "PPG-DaLiA",
+        "mHealth"
+      ],
+      "HR_direct": [
+        "PAMAP2"
+      ],
+      "EDA": [
+        "WESAD",
+        "PPG-DaLiA"
+      ],
+      "TEMP": [
+        "WESAD",
+        "PPG-DaLiA",
+        "PAMAP2"
+      ]
+    },
+    "verdict": "Total ~42 hr of paired PPG+IMU (WESAD+DaLiA, 30 subj). Sufficient for fine-tuning a pretrained time-series Transformer (Chronos/Moirai/Lag-Llama) but NOT for training one from scratch. Recommended: condition-augmented diffusion fine-tune, not raw next-token."
+  },
+  "pooled_jerk_hr_law": {
+    "law": "HR_bpm = intercept + slope * log(1 + jerk_std)",
+    "intercept": 71.3724369962539,
+    "slope": 4.05830292369975,
+    "r": 0.3772869188032709,
+    "p": 1.0513676308744212e-169,
+    "n": 5024
+  },
+  "per_dataset_coupling": [
+    {
+      "dataset": "WESAD",
+      "n_subjects": 15,
+      "per_subj_rho_mean": 0.2873033368036912,
+      "per_subj_rho_std": 0.3786240606764869,
+      "pooled_rho": 0.26188951846282854,
+      "pooled_p": 1.754455094941376e-23
+    },
+    {
+      "dataset": "PPG-DaLiA",
+      "n_subjects": 15,
+      "per_subj_rho_mean": 0.5114826795745183,
+      "per_subj_rho_std": 0.24494527436466348,
+      "pooled_rho": 0.5249201377103853,
+      "pooled_p": 3.5694791203916024e-213
+    },
+    {
+      "dataset": "mHealth",
+      "n_subjects": 10,
+      "per_subj_rho_mean": 0.674891774891775,
+      "per_subj_rho_std": 0.17057850917343895,
+      "pooled_rho": 0.637760789934703,
+      "pooled_p": 1.0570688439734825e-11
+    },
+    {
+      "dataset": "PAMAP2",
+      "n_subjects": 8,
+      "per_subj_rho_mean": 0.7628802086758286,
+      "per_subj_rho_std": 0.08995614544609394,
+      "pooled_rho": 0.7541894645063151,
+      "pooled_p": 3.254271002039216e-95
+    }
+  ],
+  "activity_hr_lut": [
+    {
+      "dataset": "PAMAP2",
+      "bucket": "light",
+      "n": 120,
+      "hr_mean": 96.07956068239979,
+      "hr_std": 12.678063545273591,
+      "jerk_mean": 119.35450983799032,
+      "jerk_std_": 59.51465721410196,
+      "rmssd_mean": 0.2034894504317914
+    },
+    {
+      "dataset": "PAMAP2",
+      "bucket": "moderate",
+      "n": 101,
+      "hr_mean": 124.9121698330233,
+      "hr_std": 8.361931139921492,
+      "jerk_mean": 444.72347764935984,
+      "jerk_std_": 254.71249271176617,
+      "rmssd_mean": 0.17785633852095634
+    },
+    {
+      "dataset": "PAMAP2",
+      "bucket": "rest",
+      "n": 159,
+      "hr_mean": 80.56541218244755,
+      "hr_std": 10.1622604538042,
+      "jerk_mean": 23.03674352020875,
+      "jerk_std_": 19.85536322112526,
+      "rmssd_mean": 0.2129201198539506
+    },
+    {
+      "dataset": "PAMAP2",
+      "bucket": "stairs",
+      "n": 28,
+      "hr_mean": 129.58047008196587,
+      "hr_std": 16.550592654895,
+      "jerk_mean": 86.27458079830289,
+      "jerk_std_": 25.964998096660096,
+      "rmssd_mean": 0.3075424355221111
+    },
+    {
+      "dataset": "PAMAP2",
+      "bucket": "vigorous",
+      "n": 36,
+      "hr_mean": 160.36727007034568,
+      "hr_std": 17.714057897939043,
+      "jerk_mean": 467.5396953904049,
+      "jerk_std_": 344.3031493444236,
+      "rmssd_mean": 0.2136256918789664
+    },
+    {
+      "dataset": "PAMAP2",
+      "bucket": "walking",
+      "n": 68,
+      "hr_mean": 112.79768942948728,
+      "hr_std": 9.146103899080101,
+      "jerk_mean": 60.36337473208914,
+      "jerk_std_": 9.968184292447189,
+      "rmssd_mean": 0.16850413065318864
+    },
+    {
+      "dataset": "PPG-DaLiA",
+      "bucket": "light",
+      "n": 137,
+      "hr_mean": 76.91320338140855,
+      "hr_std": 6.137883346048961,
+      "jerk_mean": 5.96341399184023,
+      "jerk_std_": 2.301760463756623,
+      "rmssd_mean": 364.4681015660142
+    },
+    {
+      "dataset": "PPG-DaLiA",
+      "bucket": "moderate",
+      "n": 214,
+      "hr_mean": 98.27992584131634,
+      "hr_std": 19.670088681669654,
+      "jerk_mean": 13.878374193212517,
+      "jerk_std_": 5.322858682308776,
+      "rmssd_mean": 285.22604113681973
+    },
+    {
+      "dataset": "PPG-DaLiA",
+      "bucket": "rest",
+      "n": 2169,
+      "hr_mean": 76.35806913752661,
+      "hr_std": 9.97378706196051,
+      "jerk_mean": 1.8473136726040424,
+      "jerk_std_": 1.3478873030047613,
+      "rmssd_mean": 263.3093624166065
+    },
+    {
+      "dataset": "PPG-DaLiA",
+      "bucket": "stairs",
+      "n": 198,
+      "hr_mean": 87.78819089693782,
+      "hr_std": 12.248847852706714,
+      "jerk_mean": 5.464330165565716,
+      "jerk_std_": 1.641049680851155,
+      "rmssd_mean": 329.5090823856744
+    },
+    {
+      "dataset": "PPG-DaLiA",
+      "bucket": "walking",
+      "n": 297,
+      "hr_mean": 83.64437628257741,
+      "hr_std": 7.160468502161296,
+      "jerk_mean": 4.913499674199704,
+      "jerk_std_": 1.1054252976130172,
+      "rmssd_mean": 327.22884760775395
+    },
+    {
+      "dataset": "WESAD",
+      "bucket": "rest",
+      "n": 1093,
+      "hr_mean": 71.70039663570512,
+      "hr_std": 7.483660942018539,
+      "jerk_mean": 40.721860029913046,
+      "jerk_std_": 34.24242997310098,
+      "rmssd_mean": 239.60199336316578
+    },
+    {
+      "dataset": "WESAD",
+      "bucket": "stress",
+      "n": 313,
+      "hr_mean": 78.53832132862331,
+      "hr_std": 10.713191259886946,
+      "jerk_mean": 128.00827102606726,
+      "jerk_std_": 108.01641454857412,
+      "rmssd_mean": 353.14018022315054
+    },
+    {
+      "dataset": "mHealth",
+      "bucket": "light",
+      "n": 22,
+      "hr_mean": 96.84508747094951,
+      "hr_std": 9.072691321061924,
+      "jerk_mean": 29.48647582818953,
+      "jerk_std_": 8.840743965127285,
+      "rmssd_mean": 101.72534658009626
+    },
+    {
+      "dataset": "mHealth",
+      "bucket": "moderate",
+      "n": 9,
+      "hr_mean": 99.45465696862394,
+      "hr_std": 9.05476775382553,
+      "jerk_mean": 161.79384983703028,
+      "jerk_std_": 41.131674148287374,
+      "rmssd_mean": 59.95157825959458
+    },
+    {
+      "dataset": "mHealth",
+      "bucket": "rest",
+      "n": 27,
+      "hr_mean": 74.2436873694331,
+      "hr_std": 13.595514727477878,
+      "jerk_mean": 8.376905693826467,
+      "jerk_std_": 2.856088732016143,
+      "rmssd_mean": 67.30708406560949
+    },
+    {
+      "dataset": "mHealth",
+      "bucket": "stairs",
+      "n": 7,
+      "hr_mean": 120.56049361454744,
+      "hr_std": 9.048899427677556,
+      "jerk_mean": 31.029955218243924,
+      "jerk_std_": 4.455300252779065,
+      "rmssd_mean": 65.19472317787742
+    },
+    {
+      "dataset": "mHealth",
+      "bucket": "vigorous",
+      "n": 17,
+      "hr_mean": 117.01726126448135,
+      "hr_std": 18.42364228233148,
+      "jerk_mean": 174.8868859236078,
+      "jerk_std_": 22.246134368445507,
+      "rmssd_mean": 180.07433422912095
+    },
+    {
+      "dataset": "mHealth",
+      "bucket": "walking",
+      "n": 9,
+      "hr_mean": 91.52506474831517,
+      "hr_std": 7.419758125843718,
+      "jerk_mean": 45.17008151631836,
+      "jerk_std_": 13.975446252610373,
+      "rmssd_mean": 63.399527578292656
+    }
+  ]
+}

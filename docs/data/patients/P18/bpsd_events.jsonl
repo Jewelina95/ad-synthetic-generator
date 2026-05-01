@@ -1,0 +1,3 @@
+{"day": 14, "hour": 10, "type": "anxiety", "duration_min": 20, "progression_at_event": 0.5}
+{"day": 21, "hour": 17, "type": "sundowning", "duration_min": 90, "progression_at_event": 0.8}
+{"day": 22, "hour": 13, "type": "agitation", "duration_min": 30, "progression_at_event": 0.8}

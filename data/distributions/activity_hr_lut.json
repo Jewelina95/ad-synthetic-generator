@@ -1,0 +1,39 @@
+{
+  "_source": "Pooled across 4 A-class datasets (WESAD/PPG-DaLiA/mHealth/PAMAP2), n=49 subjects, 5024 windows, see analysis/A_class/REPORT.md",
+  "_pooled_law": {
+    "formula": "HR_BPM = 71.4 + 4.06 * log(1 + jerk_std) + age_term - mmse_term",
+    "intercept": 71.4,
+    "log_jerk_slope": 4.06,
+    "age_per_year_above_65": 0.3,
+    "mmse_per_point_drop": 0.5,
+    "r": 0.377,
+    "p": "<1e-169",
+    "n_windows": 5024
+  },
+  "task_to_activity_bucket": {
+    "walking_normal": "walking",
+    "walking_dual_task": "walking",
+    "balance_standing": "rest",
+    "hand_fine_motor": "rest",
+    "sit_to_stand": "light",
+    "turning": "light",
+    "wandering_simulate": "walking",
+    "agitation_simulate": "stress",
+    "phone_using": "rest"
+  },
+  "activity_hr_baseline": {
+    "rest":     {"hr_mean": 75,  "hr_std": 4,  "jerk_target": 5},
+    "light":    {"hr_mean": 90,  "hr_std": 10, "jerk_target": 30},
+    "walking":  {"hr_mean": 96,  "hr_std": 18, "jerk_target": 60},
+    "stairs":   {"hr_mean": 113, "hr_std": 22, "jerk_target": 90},
+    "stress":   {"hr_mean": 78,  "hr_std": 11, "jerk_target": 8,  "_note": "high HR, low jerk — WESAD TSST template"},
+    "vigorous": {"hr_mean": 140, "hr_std": 30, "jerk_target": 200}
+  },
+  "per_dataset_jerk_hr_rho": {
+    "PAMAP2": 0.75,
+    "mHealth": 0.64,
+    "PPG-DaLiA": 0.52,
+    "WESAD": 0.26,
+    "_note": "Real cross-modal coupling. Generator current ρ=0.13 — must be raised to 0.4+"
+  }
+}

@@ -4,10 +4,12 @@
   "age": 69,
   "gender": "F",
   "education_years": 12,
+  "disease": "MCI",
+  "imu_profile_source": "interpolation MCI proxy",
   "cognitive_reserve_factor": 0.85,
   "progression_pattern": "plateau",
   "bpsd_prone": false,
   "bpsd_episodes_total": 0,
   "n_days": 30,
-  "generated_with": "v2.1 (calibrated by ds004504+ds007427+ds006095, with BPSD/missing/reserve)"
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
 }

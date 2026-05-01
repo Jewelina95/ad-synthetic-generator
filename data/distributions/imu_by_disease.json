@@ -1,0 +1,61 @@
+{
+  "_source": "B class IMU gait analysis: PhysioNet-gaitndd (n=64) + Daphnet-FoG (n=10) + HuGaDB (n=17)",
+  "_purpose": "Disease-conditioned stride/IMU distributions, replacing healthy-young morphing",
+  "imu_by_disease": {
+    "ctrl_young": {
+      "stride_s_mean": 1.10, "stride_s_sd": 0.09,
+      "stride_cov": 0.043, "DS_pct": 28.2, "swing_pct": 35.9,
+      "cadence": 110.0, "asymmetry": 0.06,
+      "source": "gait-ndd ctrl n=16"
+    },
+    "ctrl_elderly": {
+      "stride_s_mean": 1.15, "stride_s_sd": 0.12,
+      "stride_cov": 0.05, "DS_pct": 28.5, "swing_pct": 35.5,
+      "cadence": 105.0, "asymmetry": 0.10,
+      "source": "interpolation between gait-ndd ctrl + Mind-in-Motion ds006095 71 elderly"
+    },
+    "MCI": {
+      "stride_s_mean": 1.18, "stride_s_sd": 0.13,
+      "stride_cov": 0.06, "DS_pct": 29.5, "swing_pct": 35.0,
+      "cadence": 102.0, "asymmetry": 0.12,
+      "source": "interpolation MCI proxy"
+    },
+    "AD": {
+      "stride_s_mean": 1.22, "stride_s_sd": 0.16,
+      "stride_cov": 0.08, "DS_pct": 31.0, "swing_pct": 34.0,
+      "cadence": 98.0, "asymmetry": 0.15,
+      "source": "AD proxy interpolation (ctrl + PD midpoint + literature)"
+    },
+    "PD_mild": {
+      "stride_s_mean": 1.14, "stride_s_sd": 0.11,
+      "stride_cov": 0.18, "DS_pct": 34.1, "swing_pct": 33.0,
+      "cadence": 106.3, "asymmetry": 0.58,
+      "source": "gait-ndd PD n=15"
+    },
+    "PD_severe_FoG": {
+      "acc_mag_mean_mg": 1149, "acc_mag_sd_mg": 51,
+      "fog_ratio": 0.109, "freezing_idx": 2.84,
+      "stride_cov": 0.22, "DS_pct": 36.0,
+      "source": "Daphnet n=10"
+    },
+    "ALS": {
+      "stride_s_mean": 1.475, "stride_s_sd": 0.376,
+      "stride_cov": 0.43, "DS_pct": 40.8, "swing_pct": 32.2,
+      "cadence": 85.4, "asymmetry": 0.55,
+      "source": "gait-ndd ALS n=13"
+    },
+    "HD": {
+      "stride_cov": 0.18, "DS_pct": 30.2,
+      "_note": "stride mean unreliable due to chorea; use median",
+      "source": "gait-ndd HD n=20"
+    }
+  },
+  "fog_template": {
+    "trigger_diseases": ["PD_severe_FoG"],
+    "freezing_idx_target": 2.84,
+    "fog_ratio_per_walk": 0.109,
+    "duration_seconds_mean": 3.5,
+    "duration_seconds_sd": 2.1,
+    "_note": "AD persona should NEVER produce FoG events"
+  }
+}

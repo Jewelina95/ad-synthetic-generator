@@ -1,0 +1,15 @@
+{
+  "patient_id": "P13",
+  "base_subject": "S03_jialu",
+  "age": 74,
+  "gender": "F",
+  "education_years": 9,
+  "disease": "AD",
+  "imu_profile_source": "AD proxy interpolation (ctrl + PD midpoint + literature)",
+  "cognitive_reserve_factor": 1.0,
+  "progression_pattern": "concave",
+  "bpsd_prone": true,
+  "bpsd_episodes_total": 0,
+  "n_days": 30,
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
+}

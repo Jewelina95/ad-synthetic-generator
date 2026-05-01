@@ -1,7 +1,22 @@
 {
-  "version": "v2.2",
+  "version": "v3.1",
+  "version_notes": "10 datasets calibrated: A-class HR-jerk pooled law (n=49 subj, 5024 windows) + B-EEG 17 AD signatures (n=163) + B-IMU disease profiles (n=91, ctrl/MCI/AD/PD/ALS)",
+  "fix_log": [
+    "v3.0 (2026-05-01): cross-modal jerk-HR coupling law + activity_hr_lut + disease-conditioned IMU + 17 EEG sigs + BPSD anxiety/FoG templates",
+    "v3.1 (2026-05-01): blend ratio 70/30 + larger HR noise (kept ρ=0.50, HR mean 83 BPM, HR std needs further work)"
+  ],
+  "eval_metrics_v31": {
+    "jerk_hr_rho_synthetic": 0.5,
+    "jerk_hr_rho_real": 0.51,
+    "rho_gap": 0.006,
+    "verdict": "OK (was BUG CONFIRMED in v2.2 with rho=0.13)",
+    "ks_hr": 0.48,
+    "walking_hr_mean_synthetic": 83,
+    "walking_hr_mean_real": 94,
+    "todo": "HR std too small (1.8 vs 18.2), need inter-window slow drift in v3.2"
+  },
   "n_days": 30,
-  "n_patients": 10,
+  "n_patients": 20,
   "n_tasks": 4,
   "structure": {
     "by_patient": "data/synthetic/by_patient/PXX/sensor/dayXX_TASK.csv (个体纵向视图)",
@@ -38,8 +53,8 @@
     {
       "task_id": "balance_standing",
       "name_zh": "站立平衡",
-      "n_patients": 10,
-      "n_files": 300,
+      "n_patients": 20,
+      "n_files": 600,
       "n_days_per_patient": 30,
       "patients": [
         "P01",
@@ -51,15 +66,25 @@
         "P07",
         "P08",
         "P09",
-        "P10"
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16",
+        "P17",
+        "P18",
+        "P19",
+        "P20"
       ],
-      "total_size_mb": 284.4
+      "total_size_mb": 573.48
     },
     {
       "task_id": "hand_fine_motor",
       "name_zh": "手部精细运动",
-      "n_patients": 8,
-      "n_files": 240,
+      "n_patients": 16,
+      "n_files": 480,
       "n_days_per_patient": 30,
       "patients": [
         "P01",
@@ -69,15 +94,23 @@
         "P07",
         "P08",
         "P09",
-        "P10"
+        "P10",
+        "P11",
+        "P13",
+        "P14",
+        "P15",
+        "P16",
+        "P18",
+        "P19",
+        "P20"
       ],
-      "total_size_mb": 135.65
+      "total_size_mb": 281.97
     },
     {
       "task_id": "walking_dual_task",
       "name_zh": "双任务行走",
-      "n_patients": 10,
-      "n_files": 300,
+      "n_patients": 20,
+      "n_files": 600,
       "n_days_per_patient": 30,
       "patients": [
         "P01",
@@ -89,15 +122,25 @@
         "P07",
         "P08",
         "P09",
-        "P10"
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16",
+        "P17",
+        "P18",
+        "P19",
+        "P20"
       ],
-      "total_size_mb": 124.9
+      "total_size_mb": 253.13
     },
     {
       "task_id": "walking_normal",
       "name_zh": "正常行走",
-      "n_patients": 10,
-      "n_files": 300,
+      "n_patients": 20,
+      "n_files": 600,
       "n_days_per_patient": 30,
       "patients": [
         "P01",
@@ -109,20 +152,32 @@
         "P07",
         "P08",
         "P09",
-        "P10"
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16",
+        "P17",
+        "P18",
+        "P19",
+        "P20"
       ],
-      "total_size_mb": 436.44
+      "total_size_mb": 879.25
     }
   ],
   "personas": [
     {
       "persona": "P01",
+      "disease": "AD",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 0,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 1,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -132,11 +187,13 @@
     },
     {
       "persona": "P02",
+      "disease": "AD",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
+      "n_eeg_features": 30,
       "n_bpsd_events": 2,
       "tasks_used": [
         "walking_normal",
@@ -147,11 +204,13 @@
     },
     {
       "persona": "P03",
+      "disease": "MCI",
       "n_days": 30,
       "n_sensor_files": 90,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
+      "n_eeg_features": 30,
       "n_bpsd_events": 0,
       "tasks_used": [
         "walking_normal",
@@ -161,12 +220,14 @@
     },
     {
       "persona": "P04",
+      "disease": "AD",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 0,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 2,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -176,11 +237,13 @@
     },
     {
       "persona": "P05",
+      "disease": "MCI",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
+      "n_eeg_features": 30,
       "n_bpsd_events": 0,
       "tasks_used": [
         "walking_normal",
@@ -191,12 +254,14 @@
     },
     {
       "persona": "P06",
+      "disease": "ctrl_elderly",
       "n_days": 30,
       "n_sensor_files": 90,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 2,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -205,12 +270,14 @@
     },
     {
       "persona": "P07",
+      "disease": "AD",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
-      "n_bpsd_events": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 4,
       "tasks_used": [
         "walking_normal",
         "walking_dual_task",
@@ -220,11 +287,13 @@
     },
     {
       "persona": "P08",
+      "disease": "PD_mild",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
+      "n_eeg_features": 30,
       "n_bpsd_events": 0,
       "tasks_used": [
         "walking_normal",
@@ -235,11 +304,13 @@
     },
     {
       "persona": "P09",
+      "disease": "AD",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
+      "n_eeg_features": 30,
       "n_bpsd_events": 1,
       "tasks_used": [
         "walking_normal",
@@ -250,11 +321,181 @@
     },
     {
       "persona": "P10",
+      "disease": "MCI",
       "n_days": 30,
       "n_sensor_files": 120,
       "n_ema": 90,
       "n_surveys": 5,
       "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P11",
+      "disease": "AD",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 4,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P12",
+      "disease": "ctrl_elderly",
+      "n_days": 30,
+      "n_sensor_files": 90,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing"
+      ]
+    },
+    {
+      "persona": "P13",
+      "disease": "AD",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P14",
+      "disease": "PD_severe_FoG",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 2,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P15",
+      "disease": "MCI",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P16",
+      "disease": "AD",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P17",
+      "disease": "ctrl_elderly",
+      "n_days": 30,
+      "n_sensor_files": 90,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 2,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing"
+      ]
+    },
+    {
+      "persona": "P18",
+      "disease": "AD",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 3,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P19",
+      "disease": "PD_mild",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
+      "n_bpsd_events": 0,
+      "tasks_used": [
+        "walking_normal",
+        "walking_dual_task",
+        "balance_standing",
+        "hand_fine_motor"
+      ]
+    },
+    {
+      "persona": "P20",
+      "disease": "ALS",
+      "n_days": 30,
+      "n_sensor_files": 120,
+      "n_ema": 90,
+      "n_surveys": 5,
+      "n_notes": 1,
+      "n_eeg_features": 30,
       "n_bpsd_events": 0,
       "tasks_used": [
         "walking_normal",

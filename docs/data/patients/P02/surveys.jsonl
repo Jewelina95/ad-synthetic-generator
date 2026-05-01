@@ -1,5 +1,5 @@
-{"day": 0, "mmse_estimate": 28.8, "moca_estimate": 26.7, "phq9": 1.0}
-{"day": 7, "mmse_estimate": 29.6, "moca_estimate": 27.7, "phq9": 2.6}
-{"day": 14, "mmse_estimate": 25.4, "moca_estimate": 21.4, "phq9": 5.3}
-{"day": 21, "mmse_estimate": 17.4, "moca_estimate": 21.2, "phq9": 6.8}
-{"day": 28, "mmse_estimate": 18.1, "moca_estimate": 19.0, "phq9": 9.5}
+{"day": 0, "mmse_estimate": 30.0, "moca_estimate": 25.8, "phq9": 5.4}
+{"day": 7, "mmse_estimate": 29.9, "moca_estimate": 25.0, "phq9": 6.9}
+{"day": 14, "mmse_estimate": 22.7, "moca_estimate": 23.1, "phq9": 7.6}
+{"day": 21, "mmse_estimate": 17.2, "moca_estimate": 18.0, "phq9": 6.0}
+{"day": 28, "mmse_estimate": 17.7, "moca_estimate": 21.6, "phq9": 8.0}

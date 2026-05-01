@@ -1,0 +1,15 @@
+{
+  "patient_id": "P19",
+  "base_subject": "S04_zhe",
+  "age": 68,
+  "gender": "M",
+  "education_years": 12,
+  "disease": "PD_mild",
+  "imu_profile_source": "gait-ndd PD n=15",
+  "cognitive_reserve_factor": 0.85,
+  "progression_pattern": "linear",
+  "bpsd_prone": false,
+  "bpsd_episodes_total": 0,
+  "n_days": 30,
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
+}

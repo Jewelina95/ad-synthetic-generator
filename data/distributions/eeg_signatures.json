@@ -1,0 +1,25 @@
+{
+  "_source": "B class EEG: ds002778 (PD/HC) + ds004504 (AD/FTD/CN) + ds007427 (Lopera familial AD), n=163",
+  "_purpose": "17 statistically significant AD vs HC EEG signatures (p<0.05). Use to derive EEG-derived feature columns from progression even if generator has no raw EEG output.",
+  "ad_signatures": [
+    {"name": "alpha_rel_post",     "direction": "decrease", "hc_mean": 0.146, "ad_mean": 0.061,  "rel_change": -0.58, "p": 1.8e-6, "cliff_delta": 0.62, "mmse_rho": 0.54,  "interpretation": "Posterior alpha rhythm loss (classic AD)"},
+    {"name": "peak_alpha_freq",    "direction": "decrease", "hc_mean": 8.54,  "ad_mean": 7.55,   "rel_change": -0.12, "p": 3.7e-6, "cliff_delta": 0.60, "mmse_rho": 0.52,  "interpretation": "Alpha slowing (PAF reduction)"},
+    {"name": "hjorth_complexity",  "direction": "increase", "hc_mean": 5.30,  "ad_mean": 7.37,   "rel_change": 0.39,  "p": 1.6e-5, "cliff_delta": -0.56,"mmse_rho": -0.51, "interpretation": "Signal more chaotic (HF noise increases)"},
+    {"name": "theta_abs_mean",     "direction": "increase", "hc_mean": 112.7, "ad_mean": 272.1,  "rel_change": 1.41,  "p": 2.5e-5, "cliff_delta": -0.55,"mmse_rho": -0.45, "interpretation": "Theta power dramatically increased"},
+    {"name": "alpha_rel_mean",     "direction": "decrease", "hc_mean": 0.10,  "ad_mean": 0.05,   "rel_change": -0.48, "p": 4.5e-5, "cliff_delta": 0.53, "mmse_rho": 0.48,  "interpretation": "Whole-brain alpha degradation"},
+    {"name": "theta_alpha_ratio",  "direction": "increase", "hc_mean": 1.66,  "ad_mean": 2.45,   "rel_change": 0.47,  "p": 1.1e-4, "cliff_delta": -0.50,"mmse_rho": -0.53, "interpretation": "TAR — classic AD biomarker"},
+    {"name": "delta_rel_post",     "direction": "increase", "hc_mean": 0.60,  "ad_mean": 0.78,   "rel_change": 0.29,  "p": 1.2e-4, "cliff_delta": -0.50,"mmse_rho": -0.40, "interpretation": "Posterior delta increase"},
+    {"name": "beta_rel_post",      "direction": "decrease", "hc_mean": 0.114, "ad_mean": 0.041,  "rel_change": -0.64, "p": 1.2e-4, "cliff_delta": 0.50, "mmse_rho": 0.42,  "interpretation": "Posterior beta degradation"},
+    {"name": "lzc_mean",           "direction": "decrease", "hc_mean": 0.294, "ad_mean": 0.187,  "rel_change": -0.37, "p": 1.3e-4, "cliff_delta": 0.50, "mmse_rho": 0.47,  "interpretation": "Lempel-Ziv complexity reduction (signal more predictable)"},
+    {"name": "hjorth_mobility",    "direction": "decrease", "hc_mean": 0.180, "ad_mean": 0.103,  "rel_change": -0.43, "p": 9e-4,   "cliff_delta": 0.43, "mmse_rho": 0.38,  "interpretation": "Dominant frequency component reduction"},
+    {"name": "slowing_index",      "direction": "increase", "hc_mean": 7.73,  "ad_mean": 11.73,  "rel_change": 0.52,  "p": 1.1e-3, "cliff_delta": -0.42,"mmse_rho": -0.48, "interpretation": "(delta+theta)/(alpha+beta) global slowing"},
+    {"name": "beta_rel_mean",      "direction": "decrease", "hc_mean": 0.099, "ad_mean": 0.043,  "rel_change": -0.57, "p": 1.5e-3, "cliff_delta": 0.41, "mmse_rho": 0.40,  "interpretation": "Whole-brain beta degradation"},
+    {"name": "delta_abs_mean",     "direction": "increase", "hc_mean": 531,   "ad_mean": 1564,   "rel_change": 1.94,  "p": 2.5e-3, "cliff_delta": -0.39,"mmse_rho": -0.36, "interpretation": "Delta absolute power surge"},
+    {"name": "beta_rel_front",     "direction": "decrease", "hc_mean": 0.090, "ad_mean": 0.044,  "rel_change": -0.51, "p": 4.8e-3, "cliff_delta": 0.36, "mmse_rho": 0.35,  "interpretation": "Frontal beta degradation"},
+    {"name": "delta_rel_mean",     "direction": "increase", "hc_mean": 0.660, "ad_mean": 0.781,  "rel_change": 0.18,  "p": 5.1e-3, "cliff_delta": -0.36,"mmse_rho": -0.33, "interpretation": "Delta relative power increase"},
+    {"name": "alpha_rel_front",    "direction": "decrease", "hc_mean": 0.068, "ad_mean": 0.049,  "rel_change": -0.29, "p": 8.1e-3, "cliff_delta": 0.34, "mmse_rho": 0.34,  "interpretation": "Frontal alpha degradation"},
+    {"name": "gamma_abs_mean",     "direction": "increase", "hc_mean": 16.8,  "ad_mean": 43.1,   "rel_change": 1.56,  "p": 2.5e-2, "cliff_delta": -0.29,"mmse_rho": -0.28, "interpretation": "Gamma power increase (could be noise vs signal)"}
+  ],
+  "_top_3_strongest": ["alpha_rel_post", "peak_alpha_freq", "theta_alpha_ratio"],
+  "_top_6_mmse_correlated": ["theta_alpha_ratio", "alpha_rel_post", "peak_alpha_freq", "lzc_mean", "slowing_index", "hjorth_complexity"]
+}

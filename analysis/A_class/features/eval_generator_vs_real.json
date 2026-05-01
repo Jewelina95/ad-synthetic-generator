@@ -1,0 +1,21 @@
+{
+  "n_windows_synthetic": 300,
+  "n_windows_real_walking": 662,
+  "n_subjects_real": 23,
+  "synthetic_jerk_hr_rho": 0.5042438828453776,
+  "synthetic_jerk_hr_p": 9.398173526623238e-21,
+  "real_jerk_hr_rho": 0.5107391954438233,
+  "real_jerk_hr_p": 2.9029475818200193e-45,
+  "rho_gap": 0.006495312598445713,
+  "verdict_coupling": "OK",
+  "ks_hr_statistic": 0.47843907351460224,
+  "ks_hr_p": 2.024105349682355e-43,
+  "ks_jerk_statistic": 0.7477341389728097,
+  "ks_jerk_p": 4.934909207778117e-114,
+  "synthetic_hr_mean": 83.36945,
+  "synthetic_hr_std": 1.8437168923896083,
+  "real_walking_hr_mean": 93.71090569213382,
+  "real_walking_hr_std": 18.198468411525557,
+  "synthetic_jerk_mean": 105.94471412185186,
+  "real_jerk_mean": 63.06633579214587
+}

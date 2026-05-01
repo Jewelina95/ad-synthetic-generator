@@ -1,0 +1,15 @@
+{
+  "patient_id": "P11",
+  "base_subject": "S04_zhe",
+  "age": 82,
+  "gender": "F",
+  "education_years": 6,
+  "disease": "AD",
+  "imu_profile_source": "AD proxy interpolation (ctrl + PD midpoint + literature)",
+  "cognitive_reserve_factor": 1.15,
+  "progression_pattern": "stepwise",
+  "bpsd_prone": true,
+  "bpsd_episodes_total": 4,
+  "n_days": 30,
+  "generated_with": "v3 (10 datasets calibrated: A class HR-jerk law + B-EEG 17 sigs + B-IMU disease profiles)"
+}
